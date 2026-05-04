@@ -1,3 +1,9 @@
-## Solar Panel Yield
+# Solar Panel Yield Prediction
 
-This project predicts solar panel yield using an XGBoost model.
+This project implements Clean Architecture principles for solar panel yield prediction.
+
+## Layers
+
+- Domain Layer: ```models/```
+- Application Layer: ```services/```
+- Infrastructure Layer: ```repositories/```
