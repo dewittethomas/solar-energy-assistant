@@ -1,4 +1,6 @@
 from pydantic import BaseModel
+from datetime import datetime
 
 class PredictionOutput(BaseModel):
-    wattage: float
+    timestamp: datetime
+    value: float

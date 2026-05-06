@@ -1,9 +1,12 @@
 [project]
-name = "solar-panel-yield"
+name = "solar-energy-assistant"
 version = "0.1.0"
 description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
     "onnxruntime>=1.25.1",
+    "fastapi>=0.110.0",
+    "uvicorn>=0.29.0",
+    "redis>=7.4.0",
 ]
