@@ -1,9 +1,6 @@
 from pydantic import BaseModel
 
 class PredictionInput(BaseModel):
-    temperature_2m: float
-    wind_direction_10m: float
-    wind_speed_10m: float
     cloud_cover: float
     shortwave_radiation: float
     diffuse_radiation: float

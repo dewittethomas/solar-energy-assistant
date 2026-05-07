@@ -11,4 +11,5 @@ dependencies = [
     "redis>=7.4.0",
     "requests>=2.33.1",
     "pydantic-settings>=2.14.0",
+    "scikit-learn>=1.8.0",
 ]

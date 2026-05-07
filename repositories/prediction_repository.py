@@ -22,9 +22,6 @@ class PredictionRepository:
         input_tensor = np.array(
             [
                 [
-                    inp.temperature_2m,
-                    inp.wind_direction_10m,
-                    inp.wind_speed_10m,
                     inp.cloud_cover,
                     inp.shortwave_radiation,
                     inp.diffuse_radiation,
@@ -45,19 +42,20 @@ class PredictionRepository:
             {self.input_name: input_tensor}
         )[0]
 
-        predictions = np.maximum(0.0, raw_predictions)
+        raw_predictions = np.asarray(raw_predictions).reshape(-1)
+
+        shortwave_radiation = input_tensor[:, 1]
+        scale = 1 / (1 + np.exp(-0.1 * (shortwave_radiation - 30)))
+
+        scaled_predictions = raw_predictions * scale
 
         results = []
 
-        for i, pred in enumerate(predictions):
-            timestamp = datetime.fromisoformat(time_data[i])
-
-            value = float(pred[0]) if hasattr(pred, "__len__") else float(pred)
-
+        for i, pred in enumerate(scaled_predictions):
             results.append(
                 PredictionOutput(
-                    timestamp=timestamp,
-                    value=value
+                    timestamp=datetime.fromisoformat(time_data[i]),
+                    value=float(pred)
                 )
             )
 

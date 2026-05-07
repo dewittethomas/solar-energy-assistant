@@ -86,9 +86,6 @@ class PredictionService:
 
             inputs.append(
                 PredictionInput(
-                    temperature_2m=params["temperature_2m"][i],
-                    wind_direction_10m=params["wind_direction_10m"][i],
-                    wind_speed_10m=params["wind_speed_10m"][i],
                     cloud_cover=params["cloud_cover"][i],
                     shortwave_radiation=params["shortwave_radiation"][i],
                     diffuse_radiation=params["diffuse_radiation"][i],
@@ -105,9 +102,6 @@ class PredictionService:
 
     def _extract_weather_parameters(self, hourly: Dict[str, Any]) -> Dict[str, List]:
         return {
-            "temperature_2m": hourly.get("temperature_2m", []),
-            "wind_direction_10m": hourly.get("wind_direction_10m", []),
-            "wind_speed_10m": hourly.get("wind_speed_10m", []),
             "cloud_cover": hourly.get("cloud_cover", []),
             "shortwave_radiation": hourly.get("shortwave_radiation", []),
             "diffuse_radiation": hourly.get("diffuse_radiation", []),

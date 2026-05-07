@@ -2,9 +2,6 @@ import requests
 from typing import Dict, Any
 
 HOURLY_PARAMS = [
-    'temperature_2m',
-    'wind_direction_10m',
-    'wind_speed_10m',
     'cloud_cover',
     'shortwave_radiation',
     'diffuse_radiation',
