@@ -55,7 +55,10 @@ class PredictionRepository:
         shortwave_radiation = input_tensor[:, 1]
         scale = 1 / (1 + np.exp(-0.1 * (shortwave_radiation - 30)))
 
-        scaled_predictions = raw_predictions * scale
+        scaled_predictions = np.maximum(
+            raw_predictions * scale,
+            0.0
+        )
 
         results = []
 
