@@ -12,7 +12,15 @@ class PredictionRepository:
     def __init__(self):
         settings = get_settings()
 
-        self.session = ort.InferenceSession(settings.model_file)
+        session_options = ort.SessionOptions()
+        session_options.intra_op_num_threads = 2
+        session_options.inter_op_num_threads = 2
+
+        self.session = ort.InferenceSession(
+            settings.model_file,
+            sess_options=session_options,
+            providers=['CPUExecutionProvider']
+        )
         self.input_name = self.session.get_inputs()[0].name
     def predict_solar_yield(
         self,

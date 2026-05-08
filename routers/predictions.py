@@ -1,15 +1,16 @@
 from fastapi import APIRouter, Depends, HTTPException
-from typing import Annotated
+
+from typing import Annotated, List
+
 from services.prediction_service import PredictionService
 from models.prediction_output import PredictionOutput
-from typing import List
 from services.dependencies import get_prediction_service
 
 router = APIRouter()
 
 PredictionServiceDep = Annotated[PredictionService, Depends(get_prediction_service)]
 
-@router.get("/predictions")
+@router.get("/predictions", operation_id="predict_solar_yield", response_model=List[PredictionOutput])
 async def predict_solar_yield(
     start_date: str,
     end_date: str,
