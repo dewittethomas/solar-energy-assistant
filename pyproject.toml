@@ -6,10 +6,12 @@ readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
     "onnxruntime>=1.25.1",
-    "fastapi>=0.110.0",
+    "fastapi[standard]>=0.110.0",
     "uvicorn>=0.29.0",
     "redis>=7.4.0",
     "requests>=2.33.1",
     "pydantic-settings>=2.14.0",
     "scikit-learn>=1.8.0",
+    "fastmcp>=3.2.4",
+    "trio>=0.33.0",
 ]
