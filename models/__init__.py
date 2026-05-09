@@ -1,2 +1,1 @@
-from .prediction_input import PredictionInput
-from .prediction_output import PredictionOutput
+from .prediction import Prediction

@@ -2,14 +2,15 @@ from repositories.prediction_repository import PredictionRepository
 from services.weather_service import WeatherService
 from services.geocoding_service import GeocodingService
 from services.cache_service import CacheService
-from models.prediction_input import PredictionInput
-from models.prediction_output import PredictionOutput
+
+from models.prediction import Prediction
+from responses.prediction_result import PredictionResult
+
 from core.settings import get_settings
 
-from typing import List, Dict, Any
+from typing import Dict, Any
 import math
 from datetime import datetime
-
 
 class PredictionService:
     def __init__(
@@ -28,7 +29,9 @@ class PredictionService:
 
         coords = self.geocoding_service.get_coordinates(self.settings.location)
         if not coords:
-            raise ValueError(f"Invalid configured location: {self.settings.location}")
+            raise ValueError(
+                f"Invalid configured location: {self.settings.location}"
+            )
 
         self.latitude = coords["latitude"]
         self.longitude = coords["longitude"]
@@ -37,7 +40,7 @@ class PredictionService:
         self,
         start_date: str,
         end_date: str
-    ) -> List[PredictionOutput]:
+    ) -> PredictionResult:
 
         cache_key = (
             f"prediction:"
@@ -49,7 +52,7 @@ class PredictionService:
         if self.cache_service:
             cached = self.cache_service.get(cache_key)
             if cached:
-                return cached
+                return PredictionResult.model_validate(cached)
 
         weather_data = self.weather_service.get_weather_forecast(
             self.latitude,
@@ -59,17 +62,21 @@ class PredictionService:
             end_date
         )
 
-        prediction_inputs, time_data = self._build_inputs(weather_data)
+        inputs, time_data = self._build_inputs(weather_data)
 
-        predictions = self.repository.predict_solar_yield(
-            prediction_inputs,
+        result = self.repository.predict_solar_yield(
+            inputs,
             time_data
         )
 
         if self.cache_service:
-            self.cache_service.set(cache_key, predictions, expire=3600)
+            self.cache_service.set(
+                cache_key,
+                result.model_dump(),
+                expire=3600
+            )
 
-        return predictions
+        return result
 
     def _build_inputs(self, weather_data: Dict[str, Any]):
         hourly = weather_data.get("hourly", {})
@@ -81,11 +88,11 @@ class PredictionService:
 
         inputs = []
 
-        for i, t in enumerate(times):
-            tf = self._calculate_time_features(t)
+        for i, time_str in enumerate(times):
+            tf = self._calculate_time_features(time_str)
 
             inputs.append(
-                PredictionInput(
+                Prediction(
                     cloud_cover=params["cloud_cover"][i],
                     shortwave_radiation=params["shortwave_radiation"][i],
                     diffuse_radiation=params["diffuse_radiation"][i],
@@ -100,7 +107,7 @@ class PredictionService:
 
         return inputs, times
 
-    def _extract_weather_parameters(self, hourly: Dict[str, Any]) -> Dict[str, List]:
+    def _extract_weather_parameters(self, hourly: Dict[str, Any]) -> Dict[str, list]:
         return {
             "cloud_cover": hourly.get("cloud_cover", []),
             "shortwave_radiation": hourly.get("shortwave_radiation", []),
@@ -109,17 +116,18 @@ class PredictionService:
             "terrestrial_radiation": hourly.get("terrestrial_radiation", [])
         }
 
-    def _validate_data_consistency(self, times: List, params: Dict[str, List]):
+    def _validate_data_consistency(self, times, params):
         expected_len = len(times)
 
         for key, values in params.items():
             if len(values) != expected_len:
                 raise ValueError(
-                    f"Weather data mismatch: {key} has {len(values)} values, expected {expected_len}"
+                    f"Mismatch in {key}: "
+                    f"{len(values)} vs {expected_len}"
                 )
 
     def _calculate_time_features(self, time_string: str) -> Dict[str, float]:
-        dt = datetime.fromisoformat(time_string.replace("Z", "+00:00"))
+        dt = datetime.fromisoformat(time_string)
 
         hour = dt.hour
         day_of_year = dt.timetuple().tm_yday
