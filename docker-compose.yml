@@ -6,16 +6,20 @@ services:
     ports:
       - "8000:8000"
     depends_on:
+      - postgres
       - redis
-    environment:
-      - REDIS_HOST=redis
-      - REDIS_PORT=6379
     volumes:
       - ./model_artifacts:/app/model_artifacts
+      - ./storage/uploads:/app/storage/uploads
     restart: unless-stopped
 
   redis:
     image: redis:7-alpine
     ports:
       - "6379:6379"
+    restart: unless-stopped
+
+  postgres:
+    image: postgres:18-alpine
+    shm_size: 128mb
     restart: unless-stopped

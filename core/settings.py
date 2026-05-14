@@ -1,9 +1,9 @@
 from pathlib import Path
 from functools import lru_cache
-from pydantic import AnyUrl
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 BASE_DIR = Path(__file__).resolve().parent
+PROJECT_ROOT = BASE_DIR.parent
 
 class Settings(BaseSettings):
     host: str = '0.0.0.0'
@@ -12,7 +12,8 @@ class Settings(BaseSettings):
     location: str = "Sint-Martens-Latem, Belgium"
     timezone: str = "Europe/Brussels"
     
-    model_file: Path = BASE_DIR / 'model_artifacts/xgboost_model.onnx'
+    model_file: Path = PROJECT_ROOT / 'model_artifacts/xgboost_model.onnx'
+    upload_storage_dir: Path = PROJECT_ROOT / 'storage/uploads'
     
     redis_host: str = 'redis'
     redis_port: int = 6379

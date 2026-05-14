@@ -138,6 +138,10 @@ celerybeat.pid
 *.aof
 *.pid
 
+# Local uploaded datasets
+storage/uploads/
+model_artifacts/*-trained-*.onnx
+
 # RabbitMQ
 mnesia/
 rabbitmq/
@@ -218,3 +222,5 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+*.ipynb
