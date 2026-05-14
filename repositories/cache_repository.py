@@ -1,9 +1,9 @@
-from core.settings import get_settings
 import redis
-from typing import Any, Optional
+
+from core.settings import get_settings
 
 class CacheRepository:
-    def __init__(self):
+    def __init__(self) -> None:
         settings = get_settings()
 
         try:
@@ -17,7 +17,7 @@ class CacheRepository:
         except Exception:
             self.client = None
 
-    def get(self, key: str) -> Optional[Any]:
+    def get(self, key: str) -> str | None:
         if not self.client:
             return None
 
@@ -26,7 +26,7 @@ class CacheRepository:
         except Exception:
             return None
 
-    def set(self, key: str, value: Any, expire: int = 3600) -> bool:
+    def set(self, key: str, value: str, expire: int = 3600) -> bool:
         if not self.client:
             return False
 

@@ -6,11 +6,23 @@ services:
     ports:
       - "8000:8000"
     depends_on:
-      - postgres
-      - redis
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_started
+    environment:
+      POSTGRES_HOST: postgres
+      POSTGRES_PORT: ${POSTGRES_PORT:-5432}
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      POSTGRES_DB: ${POSTGRES_DB:-solar_energy_assistant}
+      REDIS_HOST: redis
+      REDIS_PORT: ${REDIS_PORT:-6379}
+      MODEL_STORAGE_DIR: ${MODEL_STORAGE_DIR:-model_artifacts}
+      UPLOAD_STORAGE_DIR: ${UPLOAD_STORAGE_DIR:-storage/uploads}
     volumes:
-      - ./model_artifacts:/app/model_artifacts
-      - ./storage/uploads:/app/storage/uploads
+      - ./${MODEL_STORAGE_DIR:-model_artifacts}:/app/${MODEL_STORAGE_DIR:-model_artifacts}
+      - ./${UPLOAD_STORAGE_DIR:-storage/uploads}:/app/${UPLOAD_STORAGE_DIR:-storage/uploads}
     restart: unless-stopped
 
   redis:
@@ -22,4 +34,26 @@ services:
   postgres:
     image: postgres:18-alpine
     shm_size: 128mb
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      POSTGRES_DB: ${POSTGRES_DB:-solar_energy_assistant}
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres} -d ${POSTGRES_DB:-solar_energy_assistant}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
     restart: unless-stopped
+
+  adminer:
+    image: adminer
+    restart: always
+    ports:
+      - "${ADMINER_PORT:-8080}:8080"
+
+volumes:
+  postgres_data:

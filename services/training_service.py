@@ -1,49 +1,27 @@
-import math
 import re
 from dataclasses import dataclass
 from pathlib import Path
 from uuid import uuid4
 
+import numpy as np
 import pandas as pd
 
 from core.settings import get_settings
+from models.model_features import (
+    FEATURE_COLUMNS,
+    MONTHLY_FEATURE_COLUMNS,
+    RADIATION_COLUMNS,
+    WEATHER_COLUMNS,
+)
 from repositories.model_training_repository import ModelTrainingRepository
 from responses.model_training_result import (
     ModelTrainingMetrics,
-    ModelQualityResult,
     ModelTrainingResult,
 )
+from services.evaluation_service import EvaluationService
 from services.geocoding_service import GeocodingService
+from services.metadata_service import MetadataService
 from services.weather_service import WeatherService
-
-FEATURE_COLUMNS = [
-    'cloud_cover',
-    'shortwave_radiation',
-    'diffuse_radiation',
-    'direct_normal_irradiance',
-    'terrestrial_radiation',
-    'hour_sin',
-    'hour_cos',
-    'day_of_year_sin',
-    'day_of_year_cos'
-]
-MONTHLY_FEATURE_COLUMNS = [
-    'cloud_cover',
-    'shortwave_radiation',
-    'diffuse_radiation',
-    'direct_normal_irradiance',
-    'terrestrial_radiation',
-    'month_sin',
-    'month_cos',
-    'day_of_year_sin',
-    'day_of_year_cos'
-]
-RADIATION_COLUMNS = [
-    'shortwave_radiation',
-    'diffuse_radiation',
-    'direct_normal_irradiance',
-    'terrestrial_radiation'
-]
 
 @dataclass(frozen=True)
 class TrainingSource:
@@ -52,16 +30,20 @@ class TrainingSource:
     feature_columns: list[str]
     target_column: str
 
-class ModelTrainingService:
+class TrainingService:
     def __init__(
         self,
         weather_service: WeatherService,
         geocoding_service: GeocodingService,
-        training_repository: ModelTrainingRepository
+        training_repository: ModelTrainingRepository,
+        metadata_service: MetadataService | None = None,
+        evaluation_service: EvaluationService | None = None
     ) -> None:
         self.weather_service = weather_service
         self.geocoding_service = geocoding_service
         self.training_repository = training_repository
+        self.metadata_service = metadata_service or MetadataService()
+        self.evaluation_service = evaluation_service or EvaluationService()
         self.settings = get_settings()
 
     def train_from_parquet(
@@ -72,40 +54,83 @@ class ModelTrainingService:
         activate_model: bool = False
     ) -> ModelTrainingResult:
         source = self._read_training_source(parquet_path)
+        dataset = self.metadata_service.register_parquet_dataset(parquet_path)
+        training_run = self.metadata_service.start_training_run(
+            dataset_id=str(dataset['id']),
+            notes=f'{source.frequency} {source.target_column} training started'
+        )
 
-        if source.frequency == 'monthly' and activate_model:
-            raise ValueError(
-                'Monthly energy models cannot be activated for hourly '
-                'predictions yet'
+        try:
+            weather_data = self._fetch_historical_weather(
+                source.data,
+                source.frequency
+            )
+            training_data = self._build_training_data(source, weather_data)
+            output_path = self._build_output_path(parquet_path)
+            result = self.training_repository.train_and_export(
+                features=training_data[source.feature_columns],
+                target=training_data[source.target_column],
+                output_path=output_path,
+                optimize=optimize,
+                n_trials=n_trials,
+                optimization_profile=source.frequency
+            )
+            model_path = self._format_path(result['model_path'])
+            model_quality = self.evaluation_service.build_model_quality(
+                diagnosis=result['overfitting'],
+                metrics=result['metrics']
+            )
+            should_activate = (
+                activate_model
+                and self.evaluation_service.can_activate(model_quality)
+            )
+            model = self.metadata_service.register_model(
+                dataset_id=str(dataset['id']),
+                version=str(result['training_mode']),
+                model_path=model_path,
+                is_active=should_activate,
+                metrics=result['metrics'],
+                train_size=int(result['train_rows']),
+                validation_size=int(result['validation_rows']),
+                test_size=int(result['test_rows']),
+                target_column=source.target_column
+            )
+            self.metadata_service.finish_training_run(
+                run_id=str(training_run['id']),
+                status='completed',
+                model_id=str(model['id']),
+                notes=self._build_training_run_notes(
+                    activate_model,
+                    should_activate,
+                    model_quality.message
+                )
             )
 
-        weather_data = self._fetch_historical_weather(source.data, source.frequency)
-        training_data = self._build_training_data(source, weather_data)
-        output_path = self._build_output_path(parquet_path, activate_model)
-        result = self.training_repository.train_and_export(
-            features=training_data[source.feature_columns],
-            target=training_data[source.target_column],
-            output_path=output_path,
-            optimize=optimize,
-            n_trials=n_trials,
-            optimization_profile=source.frequency
-        )
-
-        return ModelTrainingResult(
-            model_path=self._format_path(result['model_path']),
-            source_path=self._format_path(parquet_path),
-            training_rows=len(training_data),
-            train_rows=result['train_rows'],
-            validation_rows=result['validation_rows'],
-            test_rows=result['test_rows'],
-            feature_columns=source.feature_columns,
-            target_column=source.target_column,
-            optimized=optimize,
-            training_mode=result['training_mode'],
-            best_params=result['best_params'],
-            metrics=ModelTrainingMetrics(**result['metrics']),
-            model_quality=self._build_model_quality(result['overfitting'])
-        )
+            return ModelTrainingResult(
+                dataset_id=str(dataset['id']),
+                model_id=str(model['id']),
+                model_path=model_path,
+                is_active=should_activate,
+                source_path=self._format_path(parquet_path),
+                training_rows=len(training_data),
+                train_rows=result['train_rows'],
+                validation_rows=result['validation_rows'],
+                test_rows=result['test_rows'],
+                feature_columns=source.feature_columns,
+                target_column=source.target_column,
+                optimized=optimize,
+                training_mode=result['training_mode'],
+                best_params=result['best_params'],
+                metrics=ModelTrainingMetrics(**result['metrics']),
+                model_quality=model_quality
+            )
+        except Exception as exc:
+            self.metadata_service.finish_training_run(
+                run_id=str(training_run['id']),
+                status='failed',
+                notes=str(exc)
+            )
+            raise
 
     def _read_training_source(self, parquet_path: Path) -> TrainingSource:
         if not parquet_path.exists():
@@ -246,17 +271,13 @@ class ModelTrainingService:
 
         df['hour'] = df['timestamp'].dt.hour
         df['day_of_year'] = df['timestamp'].dt.dayofyear
-        df['hour_sin'] = df['hour'].map(
-            lambda hour: math.sin(2 * math.pi * hour / 24)
-        )
-        df['hour_cos'] = df['hour'].map(
-            lambda hour: math.cos(2 * math.pi * hour / 24)
-        )
-        df['day_of_year_sin'] = df['day_of_year'].map(
-            lambda day: math.sin(2 * math.pi * day / 365)
-        )
-        df['day_of_year_cos'] = df['day_of_year'].map(
-            lambda day: math.cos(2 * math.pi * day / 365)
+        self._add_cyclical_features(df, 'hour', 24, 'hour_sin', 'hour_cos')
+        self._add_cyclical_features(
+            df,
+            'day_of_year',
+            365,
+            'day_of_year_sin',
+            'day_of_year_cos'
         )
 
         return df.dropna(subset=[*FEATURE_COLUMNS, 'solar_power_w'])
@@ -278,20 +299,28 @@ class ModelTrainingService:
         )
         df['month'] = df['timestamp'].dt.month
         df['day_of_year'] = month_middle.dt.dayofyear
-        df['month_sin'] = df['month'].map(
-            lambda month: math.sin(2 * math.pi * month / 12)
-        )
-        df['month_cos'] = df['month'].map(
-            lambda month: math.cos(2 * math.pi * month / 12)
-        )
-        df['day_of_year_sin'] = df['day_of_year'].map(
-            lambda day: math.sin(2 * math.pi * day / 365)
-        )
-        df['day_of_year_cos'] = df['day_of_year'].map(
-            lambda day: math.cos(2 * math.pi * day / 365)
+        self._add_cyclical_features(df, 'month', 12, 'month_sin', 'month_cos')
+        self._add_cyclical_features(
+            df,
+            'day_of_year',
+            365,
+            'day_of_year_sin',
+            'day_of_year_cos'
         )
 
         return df.dropna(subset=[*MONTHLY_FEATURE_COLUMNS, 'solar_energy_kwh'])
+
+    def _add_cyclical_features(
+        self,
+        df: pd.DataFrame,
+        source_column: str,
+        period: int,
+        sine_column: str,
+        cosine_column: str
+    ) -> None:
+        angle = 2 * np.pi * df[source_column] / period
+        df[sine_column] = np.sin(angle)
+        df[cosine_column] = np.cos(angle)
 
     def _aggregate_monthly_weather(
         self,
@@ -301,80 +330,53 @@ class ModelTrainingService:
         weather['timestamp'] = pd.to_datetime(weather['timestamp'], errors='coerce')
         weather = weather.dropna(subset=['timestamp'])
 
-        for column in ['cloud_cover', *RADIATION_COLUMNS]:
+        for column in WEATHER_COLUMNS:
             weather[column] = pd.to_numeric(weather[column], errors='coerce')
 
         weather['timestamp'] = weather['timestamp'].dt.to_period('M').dt.to_timestamp()
+        aggregation = {
+            'cloud_cover': 'mean',
+            **{
+                column: 'sum'
+                for column in RADIATION_COLUMNS
+            }
+        }
 
         return (
             weather
             .groupby('timestamp', as_index=False)
-            .agg({
-                'cloud_cover': 'mean',
-                'shortwave_radiation': 'sum',
-                'diffuse_radiation': 'sum',
-                'direct_normal_irradiance': 'sum',
-                'terrestrial_radiation': 'sum'
-            })
+            .agg(aggregation)
         )
 
     def _build_output_path(
         self,
-        parquet_path: Path,
-        activate_model: bool
+        parquet_path: Path
     ) -> Path:
-        if activate_model:
-            return self.settings.model_file
-
         safe_name = self._safe_name(parquet_path.stem)
 
         return (
-            self.settings.model_file.parent
+            self.settings.model_storage_dir
             / f'{safe_name}-trained-{uuid4().hex}.onnx'
         )
+
+    def _build_training_run_notes(
+        self,
+        activate_model: bool,
+        should_activate: bool,
+        quality_message: str
+    ) -> str:
+        if should_activate:
+            return 'Training completed and model was activated'
+
+        if activate_model:
+            return f'Training completed but model was not activated. {quality_message}'
+
+        return 'Training completed'
 
     def _safe_name(self, value: str) -> str:
         safe_value = re.sub(r'[^A-Za-z0-9_.-]+', '-', value).strip('.-')
 
         return safe_value or 'model'
-
-    def _build_model_quality(
-        self,
-        diagnosis: dict[str, object]
-    ) -> ModelQualityResult:
-        status = diagnosis.get('status')
-
-        if status == 'likely_overfitting':
-            return ModelQualityResult(
-                status='warning',
-                message=(
-                    'The model may be too specific to this dataset and could '
-                    'perform worse on new data.'
-                )
-            )
-
-        if status == 'possible_overfitting':
-            return ModelQualityResult(
-                status='warning',
-                message=(
-                    'The model looks useful, but predictions should be checked '
-                    'with new measurements.'
-                )
-            )
-
-        if status == 'possible_distribution_shift':
-            return ModelQualityResult(
-                status='warning',
-                message=(
-                    'Recent data behaves differently from earlier data. Check '
-                    'predictions with recent measurements before relying on it.'
-                )
-            )
-
-        return ModelQualityResult(
-            status='good',
-            message='The model looks consistent on the available data.'
-        )
 
     def _format_path(self, path: Path) -> str:
         try:

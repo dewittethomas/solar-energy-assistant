@@ -9,6 +9,9 @@ class TimeResolutionResult(BaseModel):
     interval_minutes: float | None
 
 class DataUploadResult(BaseModel):
+    dataset_id: str
+    dataset_hash: str
+    dataset_already_exists: bool
     installation_id: str
     rows: int
     columns: list[str]

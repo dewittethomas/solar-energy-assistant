@@ -9,7 +9,7 @@ from ingestion.time_resolution_detector import TimeResolutionDetector
 from models.column_mapping import ColumnMapping
 from services.parquet_service import ParquetService
 
-class CsvPreprocessingService:
+class PreprocessingService:
     def __init__(
         self,
         csv_reader: CsvDataReader | None = None,

@@ -11,7 +11,10 @@ class ModelQualityResult(BaseModel):
     message: str
 
 class ModelTrainingResult(BaseModel):
+    dataset_id: str
+    model_id: str
     model_path: str
+    is_active: bool
     source_path: str
     training_rows: int
     train_rows: int

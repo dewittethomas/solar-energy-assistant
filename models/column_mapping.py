@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from typing import Self
 
 @dataclass
 class ColumnMapping:
@@ -8,7 +9,7 @@ class ColumnMapping:
     unit: str
 
     @classmethod
-    def from_payload(cls, payload: dict[str, object]) -> 'ColumnMapping':
+    def from_payload(cls, payload: dict[str, object]) -> Self:
         date_column = payload.get('date_column')
         time_column = payload.get('time_column')
         measurement_column = payload.get('measurement_column')

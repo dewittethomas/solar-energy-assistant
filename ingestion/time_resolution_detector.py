@@ -2,7 +2,6 @@ import pandas as pd
 
 from models.time_resolution import TimeResolution
 
-
 class TimeResolutionDetector:
     def detect(self, df: pd.DataFrame) -> TimeResolution:
         if 'timestamp' not in df.columns:
@@ -31,16 +30,15 @@ class TimeResolutionDetector:
         return TimeResolution('unknown', interval_minutes)
 
     def _looks_monthly(self, timestamps: pd.Series) -> bool:
-        month_numbers = timestamps.dt.to_period('M').map(
-            lambda period: period.ordinal
-        )
+        months = timestamps.dt.to_period('M')
+        month_numbers = months.map(lambda period: period.ordinal)
         month_steps = month_numbers.diff().dropna()
 
         if month_steps.empty:
             return False
 
         monthly_step_ratio = (month_steps == 1).mean()
-        same_month_count = timestamps.dt.to_period('M').nunique()
+        same_month_count = months.nunique()
 
         return (
             monthly_step_ratio >= 0.8

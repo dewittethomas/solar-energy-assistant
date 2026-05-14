@@ -5,6 +5,40 @@ import pandas as pd
 from core.settings import get_settings
 from models.column_mapping import ColumnMapping
 
+MONTH_REPLACEMENTS = {
+    'jan': 'jan',
+    'januari': 'jan',
+    'feb': 'feb',
+    'februari': 'feb',
+    'mrt': 'mar',
+    'maart': 'mar',
+    'mar': 'mar',
+    'apr': 'apr',
+    'april': 'apr',
+    'mei': 'may',
+    'may': 'may',
+    'jun': 'jun',
+    'juni': 'jun',
+    'jul': 'jul',
+    'juli': 'jul',
+    'aug': 'aug',
+    'augustus': 'aug',
+    'sep': 'sep',
+    'sept': 'sep',
+    'september': 'sep',
+    'okt': 'oct',
+    'oktober': 'oct',
+    'oct': 'oct',
+    'october': 'oct',
+    'nov': 'nov',
+    'november': 'nov',
+    'dec': 'dec',
+    'december': 'dec',
+}
+MONTH_YEAR_PATTERN = re.compile(r'^([A-Za-z]+)\.?\s+(\d{4})$')
+THOUSANDS_DOT_PATTERN = re.compile(r'^-?\d{1,3}(\.\d{3})+$')
+ISO_DATE_PATTERN = re.compile(r'^\d{4}-\d{2}-\d{2}')
+TIMEZONE_PATTERN = re.compile(r'(?:[zZ]|[+-]\d{2}:?\d{2})$')
 
 class DataFrameCanonicalizer:
     def __init__(self, timezone: str | None = None) -> None:
@@ -92,81 +126,36 @@ class DataFrameCanonicalizer:
             .str.replace(' ', '', regex=False)
         )
 
-        def normalize_number(value: str) -> str:
-            if value in ('', 'nan', 'None'):
-                return ''
-
-            has_comma = ',' in value
-            has_dot = '.' in value
-
-            if has_comma and has_dot:
-                decimal_separator = ',' if value.rfind(',') > value.rfind('.') else '.'
-                thousands_separator = '.' if decimal_separator == ',' else ','
-
-                value = value.replace(thousands_separator, '')
-                value = value.replace(decimal_separator, '.')
-            elif has_comma:
-                value = value.replace(',', '.')
-            elif re.match(r'^-?\d{1,3}(\.\d{3})+$', value):
-                value = value.replace('.', '')
-
-            return value
-
         return pd.to_numeric(
-            normalized.map(normalize_number),
+            normalized.map(self._normalize_number),
             errors='coerce'
         )
 
+    def _normalize_number(self, value: str) -> str:
+        if value in ('', 'nan', 'None'):
+            return ''
+
+        has_comma = ',' in value
+        has_dot = '.' in value
+
+        if has_comma and has_dot:
+            decimal_separator = ',' if value.rfind(',') > value.rfind('.') else '.'
+            thousands_separator = '.' if decimal_separator == ',' else ','
+            value = value.replace(thousands_separator, '')
+            return value.replace(decimal_separator, '.')
+
+        if has_comma:
+            return value.replace(',', '.')
+
+        if THOUSANDS_DOT_PATTERN.match(value):
+            return value.replace('.', '')
+
+        return value
+
     def _parse_timestamp_series(self, values: pd.Series) -> pd.Series:
-        month_replacements = {
-            'jan': 'jan',
-            'januari': 'jan',
-            'feb': 'feb',
-            'februari': 'feb',
-            'mrt': 'mar',
-            'maart': 'mar',
-            'mar': 'mar',
-            'apr': 'apr',
-            'april': 'apr',
-            'mei': 'may',
-            'may': 'may',
-            'jun': 'jun',
-            'juni': 'jun',
-            'jul': 'jul',
-            'juli': 'jul',
-            'aug': 'aug',
-            'augustus': 'aug',
-            'sep': 'sep',
-            'sept': 'sep',
-            'september': 'sep',
-            'okt': 'oct',
-            'oktober': 'oct',
-            'oct': 'oct',
-            'october': 'oct',
-            'nov': 'nov',
-            'november': 'nov',
-            'dec': 'dec',
-            'december': 'dec',
-        }
-
-        def normalize_timestamp(value: object) -> object:
-            if pd.isna(value):
-                return value
-
-            normalized = str(value).strip()
-            match = re.match(r'^([A-Za-z]+)\.?\s+(\d{4})$', normalized)
-
-            if match:
-                month = month_replacements.get(match.group(1).lower())
-
-                if month:
-                    return f'1 {month} {match.group(2)}'
-
-            return normalized
-
-        normalized_values = values.map(normalize_timestamp)
+        normalized_values = values.map(self._normalize_timestamp)
         iso_timestamps = normalized_values.astype(str).str.match(
-            r'^\d{4}-\d{2}-\d{2}'
+            ISO_DATE_PATTERN.pattern
         )
         timestamps = pd.Series(pd.NaT, index=normalized_values.index)
 
@@ -187,6 +176,23 @@ class DataFrameCanonicalizer:
 
         return pd.to_datetime(timestamps)
 
+    def _normalize_timestamp(self, value: object) -> object:
+        if pd.isna(value):
+            return value
+
+        normalized = str(value).strip()
+        match = MONTH_YEAR_PATTERN.match(normalized)
+
+        if not match:
+            return normalized
+
+        month = MONTH_REPLACEMENTS.get(match.group(1).lower())
+
+        if not month:
+            return normalized
+
+        return f'1 {month} {match.group(2)}'
+
     def _parse_without_timezone(
         self,
         values: pd.Series,
@@ -194,7 +200,7 @@ class DataFrameCanonicalizer:
     ) -> pd.Series:
         values_as_text = values.astype(str).str.strip()
         has_timezone = values_as_text.str.contains(
-            r'(?:[zZ]|[+-]\d{2}:?\d{2})$',
+            TIMEZONE_PATTERN.pattern,
             regex=True,
             na=False
         )

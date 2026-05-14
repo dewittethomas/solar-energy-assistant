@@ -1,11 +1,30 @@
-# Solar Energy Assistant API
+# Solar Energy Assistant
 
-This project implements a solar panel yield prediction API using Clean Architecture principles. It integrates weather data, geocoding, and machine learning to predict solar energy generation.
+Solar Energy Assistant is a FastAPI backend for solar dataset uploads, model training, predictions, recommendations, and user metadata.
 
-This project implements Clean Architecture principles for solar panel yield prediction.
+## Directory Structure
 
-## Layers
+```text
+core/             Application settings
+ingestion/        File reading, column mapping, canonicalization, and time resolution
+models/           Request models and domain-style value objects
+repositories/     Database, parquet, cache, weather, and model persistence
+responses/        API response schemas
+routers/          FastAPI route definitions
+services/         Business logic orchestration
+model_artifacts/  Generated ONNX models
+storage/uploads/  Uploaded and processed datasets
+```
 
-- Domain Layer: ```models/```
-- Application Layer: ```services/```
-- Infrastructure Layer: ```repositories/```
+## Run Locally
+
+```bash
+uv sync
+uv run uvicorn main:app --reload
+```
+
+## Run With Docker
+
+```bash
+docker compose up --build
+```

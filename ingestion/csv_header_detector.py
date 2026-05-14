@@ -2,6 +2,25 @@ import csv
 import re
 from pathlib import Path
 
+MONTH_NAMES = (
+    'jan|januari|'
+    'feb|februari|'
+    'mar|march|mrt|maart|'
+    'apr|april|'
+    'may|mei|'
+    'jun|june|juni|'
+    'jul|july|juli|'
+    'aug|august|augustus|'
+    'sep|sept|september|'
+    'oct|okt|october|oktober|'
+    'nov|november|'
+    'dec|december'
+)
+DATE_PATTERNS = [
+    re.compile(r'^\d{4}-\d{2}-\d{2}', re.IGNORECASE),
+    re.compile(r'^\d{1,2}[./-]\d{1,2}[./-]\d{2,4}', re.IGNORECASE),
+    re.compile(rf'^({MONTH_NAMES})\.? \d{{4}}$', re.IGNORECASE),
+]
 
 class CsvHeaderDetector:
     def detect(self, file_path: Path, max_rows: int = 50) -> tuple[int, csv.Dialect]:
@@ -56,13 +75,10 @@ class CsvHeaderDetector:
         if self._data_like_ratio(first_matching_row) < required_ratio:
             return False
 
-        data_rows = [
-            row
+        return any(
+            self._data_like_ratio(row) >= required_ratio
             for row in matching_next_rows[:5]
-            if self._data_like_ratio(row) >= required_ratio
-        ]
-
-        return len(data_rows) >= 1
+        )
 
     def _data_like_ratio(self, row: list[str]) -> float:
         cells = self._filled_cells(row)
@@ -110,29 +126,8 @@ class CsvHeaderDetector:
 
     def _is_date_like(self, value: str) -> bool:
         normalized = value.strip()
-        month_names = (
-            'jan|januari|'
-            'feb|februari|'
-            'mar|march|mrt|maart|'
-            'apr|april|'
-            'may|mei|'
-            'jun|june|juni|'
-            'jul|july|juli|'
-            'aug|august|augustus|'
-            'sep|sept|september|'
-            'oct|okt|october|oktober|'
-            'nov|november|'
-            'dec|december'
-        )
-
-        date_patterns = [
-            r'^\d{4}-\d{2}-\d{2}',
-            r'^\d{1,2}[./-]\d{1,2}[./-]\d{2,4}',
-            rf'^({month_names})\.? \d{{4}}$',
-        ]
 
         return any(
-            re.match(pattern, normalized, re.IGNORECASE)
-            for pattern in date_patterns
+            pattern.match(normalized)
+            for pattern in DATE_PATTERNS
         )
-

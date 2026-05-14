@@ -1,6 +1,6 @@
-from pydantic import BaseModel
 from datetime import date, time
-from typing import List
+
+from pydantic import BaseModel
 
 class HourlyPredictionResult(BaseModel):
     hour: time
@@ -9,8 +9,8 @@ class HourlyPredictionResult(BaseModel):
 class DailyPredictionResult(BaseModel):
     day: date
     average: float
-    predictions: List[HourlyPredictionResult]
+    predictions: list[HourlyPredictionResult]
 
 class PredictionResult(BaseModel):
     total_average: float
-    predictions: List[DailyPredictionResult]
+    predictions: list[DailyPredictionResult]

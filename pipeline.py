@@ -3,16 +3,16 @@ import pandas as pd
 
 from models.column_mapping import ColumnMapping
 from responses.model_training_result import ModelTrainingResult
-from services.csv_preprocessing_service import CsvPreprocessingService
-from services.model_training_service import ModelTrainingService
+from services.preprocessing_service import PreprocessingService
+from services.training_service import TrainingService
 
 class CsvPreprocessingPipeline:
     def __init__(
         self,
-        preprocessing_service: CsvPreprocessingService | None = None
+        preprocessing_service: PreprocessingService | None = None
     ) -> None:
         self._preprocessing_service = (
-            preprocessing_service or CsvPreprocessingService()
+            preprocessing_service or PreprocessingService()
         )
 
     def read_csv(self, file: Path):
@@ -78,7 +78,7 @@ class CsvPreprocessingPipeline:
 class ModelTrainingPipeline:
     def __init__(
         self,
-        training_service: ModelTrainingService
+        training_service: TrainingService
     ) -> None:
         self._training_service = training_service
 

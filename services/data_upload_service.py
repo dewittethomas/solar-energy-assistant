@@ -11,13 +11,16 @@ from responses.data_upload_result import (
     DataUploadResult,
     TimeResolutionResult,
 )
+from services.metadata_service import MetadataService
 
 class DataUploadService:
     def __init__(
         self,
-        pipeline: CsvPreprocessingPipeline | None = None
+        pipeline: CsvPreprocessingPipeline | None = None,
+        metadata_service: MetadataService | None = None
     ) -> None:
         self._pipeline = pipeline
+        self._metadata_service = metadata_service or MetadataService()
         self._settings = get_settings()
 
     def get_csv_columns(
@@ -80,12 +83,23 @@ class DataUploadService:
                 installation_id
             )
             parquet_path = self._pipeline.save_parquet(hourly, output_path)
+            value_column = self._get_value_column(hourly.columns.tolist())
+            dataset = self._metadata_service.register_dataset(
+                df=hourly,
+                installation_id=installation_id,
+                path=parquet_path,
+                granularity=str(time_resolution['kind']),
+                value_column=value_column
+            )
 
             return DataUploadResult(
+                dataset_id=str(dataset['id']),
+                dataset_hash=str(dataset['dataset_hash']),
+                dataset_already_exists=bool(dataset['already_exists']),
                 installation_id=installation_id,
                 rows=len(hourly),
                 columns=hourly.columns.tolist(),
-                value_column=self._get_value_column(hourly.columns.tolist()),
+                value_column=value_column,
                 time_resolution=TimeResolutionResult(
                     kind=str(time_resolution['kind']),
                     interval_minutes=time_resolution['intervalMinutes']

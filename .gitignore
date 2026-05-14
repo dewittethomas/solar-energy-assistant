@@ -1,3 +1,13 @@
+# Local uploaded datasets
+storage/uploads/
+storage/*.sqlite3
+storage/*.sqlite3-*
+storage/*.db
+storage/*.db-*
+model_artifacts/*.onnx
+frontend/node_modules/
+frontend/dist/
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[codz]
@@ -137,10 +147,6 @@ celerybeat.pid
 *.rdb
 *.aof
 *.pid
-
-# Local uploaded datasets
-storage/uploads/
-model_artifacts/*-trained-*.onnx
 
 # RabbitMQ
 mnesia/

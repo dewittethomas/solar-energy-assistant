@@ -1,5 +1,4 @@
 from pathlib import Path
-from typing import Any
 
 import numpy as np
 import pandas as pd
@@ -15,7 +14,7 @@ class ModelTrainingRepository:
         optimize: bool = False,
         n_trials: int = 50,
         optimization_profile: str = 'hourly'
-    ) -> dict[str, Any]:
+    ) -> dict[str, object]:
         self._validate_training_data(features, target)
 
         x = features.to_numpy(dtype=np.float32)
@@ -201,11 +200,11 @@ class ModelTrainingRepository:
 
         return {
             name: float(
-                (
-                    train_metrics[name]
-                    + validation_metrics[name]
-                    + test_metrics[name]
-                ) / 3
+                np.mean([
+                    train_metrics[name],
+                    validation_metrics[name],
+                    test_metrics[name]
+                ])
             )
             for name in metric_names
         }
