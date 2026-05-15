@@ -1,0 +1,271 @@
+{
+  "app": {
+    "title": "Solar Panel Assistant"
+  },
+  "navigation": {
+    "dashboard": "Dashboard",
+    "assistant": "Assistant",
+    "models": "Models",
+    "dataManagement": "Data Management",
+    "settings": "Configuration"
+  },
+  "profile": {
+    "name": "Thomas Peeters"
+  },
+  "dashboard": {
+    "eyebrow": "Overview",
+    "title": "Dashboard City - Name",
+    "weather": {
+      "title": "Weather",
+      "temperature": "22°C",
+      "cloudStatus": "Partly cloudy",
+      "tomorrow": "Tomorrow",
+      "tomorrowCloudStatus": "Lightly cloudy",
+      "min": "min",
+      "max": "max",
+      "tomorrowMin": "16",
+      "tomorrowMax": "25°C"
+    },
+    "info": {
+      "title": "Info",
+      "today": "Today",
+      "peak": "Today's peak",
+      "peakValue": "12:00 - 14:00",
+      "yield": "Today's yield",
+      "yieldValue": "28.4 kWh",
+      "output": "Current output",
+      "outputValue": "4.8 kW"
+    },
+    "prediction": {
+      "eyebrow": "Prediction",
+      "meta": "Demo data · kW",
+      "chartTitle": "Demo solar output prediction for three days",
+      "day1": "Day 1",
+      "day2": "Day 2",
+      "day3": "Day 3"
+    }
+  },
+  "pages": {
+    "models": {
+      "eyebrow": "Models",
+      "title": "Models",
+      "text": "Choose which model is used for predictions.",
+      "listLabel": "Models list",
+      "listTitle": "Available models",
+      "r2": "Accuracy",
+      "mse": "Offset (kW)",
+      "dataset": "Dataset",
+      "trainedOn": "Trained on",
+      "enabled": "Enabled",
+      "disabled": "Disabled",
+      "activateModel": "Enable {{model}}"
+    },
+    "dataManagement": {
+      "eyebrow": "Data",
+      "title": "Data Management",
+      "text": "Here you can find the datasets you added.",
+      "listLabel": "Datasets list",
+      "listTitle": "Available datasets",
+      "location": "Location",
+      "resolution": "Resolution",
+      "rows": "Rows",
+      "dateRange": "Date range"
+    },
+    "assistant": {
+      "eyebrow": "Assistant",
+      "title": "Energy Assistant",
+      "heading": "Energy Assistant",
+      "text": "Choose which devices you want to run and get a recommended time window.",
+      "devices": {
+        "eyebrow": "Devices",
+        "title": "Which devices do you want to run?",
+        "result": {
+          "timeWindow": "12:00 - 15:00",
+          "production": "5.8 kW",
+          "confidence": "High",
+          "reason": "This combination fits well within today's expected solar peak.",
+          "empty": "Select at least one device to get a recommendation."
+        }
+      },
+      "form": {
+        "preferredDate": "Preferred date",
+        "timeWindow": "Preferred time window",
+        "timeOptions": {
+          "morning": "Morning",
+          "daytime": "Daytime",
+          "afternoon": "Afternoon",
+          "evening": "Evening"
+        }
+      },
+      "appliances": {
+        "washingMachine": "Washing machine",
+        "dishwasher": "Dishwasher",
+        "dryer": "Dryer",
+        "boiler": "Boiler"
+      },
+      "result": {
+        "eyebrow": "Recommendation",
+        "title": "Result",
+        "timeWindow": "Recommended time window",
+        "expectedProduction": "Expected production",
+        "confidence": "Confidence"
+      },
+      "schedule": {
+        "eyebrow": "Schedule",
+        "title": "Recommended schedule",
+        "empty": "Select devices to see a schedule.",
+        "washingMachine": {
+          "time": "10:30 - 12:00",
+          "note": "Start early enough so the cycle finishes during the solar peak."
+        },
+        "dishwasher": {
+          "time": "12:00 - 13:30",
+          "note": "Fits well inside the strongest production moment of the day."
+        },
+        "dryer": {
+          "time": "13:30 - 15:00",
+          "note": "Use after the dishwasher while production remains high."
+        },
+        "boiler": {
+          "time": "11:00 - 15:00",
+          "note": "Let the boiler heat gradually during sunny hours."
+        }
+      },
+      "tabs": {
+        "label": "Advice categories",
+        "car": "Car charging",
+        "washingMachine": "Washing machine",
+        "dishwasher": "Dishwasher",
+        "dryer": "Dryer",
+        "boiler": "Boiler"
+      },
+      "advice": {
+        "car": {
+          "eyebrow": "Car",
+          "title": "When should I charge my car?",
+          "summary": "Charge around midday, when the predicted solar production is highest.",
+          "items": [
+            { "label": "Best time", "value": "12:00 - 15:00" },
+            { "label": "Reason", "value": "Highest solar production" },
+            { "label": "Advice", "value": "Start charging after 12:00" }
+          ]
+        },
+        "washingMachine": {
+          "eyebrow": "Washing machine",
+          "title": "When should I run the washing machine?",
+          "summary": "Schedule the washing machine late in the morning so the cycle finishes during the peak.",
+          "items": [
+            { "label": "Best time", "value": "10:30 - 13:00" },
+            { "label": "Reason", "value": "Rising production" },
+            { "label": "Advice", "value": "Use delayed start" }
+          ]
+        },
+        "dishwasher": {
+          "eyebrow": "Dishwasher",
+          "title": "When should I run the dishwasher?",
+          "summary": "Run the dishwasher around midday or early afternoon, when solar production is strong enough.",
+          "items": [
+            { "label": "Best time", "value": "12:00 - 14:30" },
+            { "label": "Reason", "value": "Good production during a short cycle" },
+            { "label": "Advice", "value": "Use eco mode or delayed start" }
+          ]
+        },
+        "dryer": {
+          "eyebrow": "Dryer",
+          "title": "When should I use the dryer?",
+          "summary": "Use the dryer just after the midday peak, while production is still strong.",
+          "items": [
+            { "label": "Best time", "value": "13:00 - 16:00" },
+            { "label": "Reason", "value": "Strong afternoon production" },
+            { "label": "Advice", "value": "Avoid evening hours" }
+          ]
+        },
+        "boiler": {
+          "eyebrow": "Boiler",
+          "title": "When should I heat the boiler?",
+          "summary": "Heat the boiler during the day so it needs less grid energy in the evening.",
+          "items": [
+            { "label": "Best time", "value": "11:00 - 15:00" },
+            { "label": "Reason", "value": "Steady solar production" },
+            { "label": "Advice", "value": "Plan heating around midday" }
+          ]
+        }
+      }
+    }
+  },
+  "settings": {
+    "eyebrow": "Configuration",
+    "title": "Configuration",
+    "preferencesLabel": "Preferences",
+    "tabs": {
+      "label": "Configuration tabs",
+      "installation": "Installation",
+      "consumption": "Consumption",
+      "preferences": "Preferences"
+    },
+    "installation": {
+      "title": "Installation",
+      "text": "Enter the basic details of the solar panel installation.",
+      "powerTitle": "Power",
+      "powerText": "Enter the total peak power of the installation.",
+      "panelCount": "Number of panels",
+      "installationKwp": "Installation power (kWp)"
+    },
+    "consumption": {
+      "title": "Consumption",
+      "kwh": "Consumption (kWh)",
+      "car": {
+        "title": "Car charging",
+        "text": "Average consumption per charging session."
+      },
+      "washingMachine": {
+        "title": "Washing machine",
+        "text": "Average consumption per washing cycle."
+      },
+      "dishwasher": {
+        "title": "Dishwasher",
+        "text": "Average consumption per dishwasher cycle."
+      },
+      "dryer": {
+        "title": "Dryer",
+        "text": "Average consumption per drying cycle."
+      },
+      "boiler": {
+        "title": "Boiler",
+        "text": "Average consumption per heating cycle."
+      }
+    },
+    "appearance": {
+      "title": "Appearance",
+      "text": "Switch between a light interface and a darker low-light view.",
+      "dark": "Dark mode",
+      "light": "Light mode"
+    },
+    "language": {
+      "title": "Language",
+      "text": "Choose the language preference for the application interface.",
+      "label": "Language",
+      "nl": {
+        "label": "Nederlands",
+        "description": "Dutch"
+      },
+      "fr": {
+        "label": "Français",
+        "description": "French"
+      },
+      "en": {
+        "label": "English",
+        "description": "English"
+      }
+    }
+  },
+  "demo": {
+    "status": {
+      "ready": "Ready"
+    },
+    "resolution": {
+      "hourly": "Hourly",
+      "fifteenMinutes": "15 minutes"
+    }
+  }
+}

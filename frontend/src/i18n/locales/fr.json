@@ -1,0 +1,271 @@
+{
+  "app": {
+    "title": "Solar Panel Assistant"
+  },
+  "navigation": {
+    "dashboard": "Tableau de bord",
+    "assistant": "Assistant",
+    "models": "Modèles",
+    "dataManagement": "Gestion des données",
+    "settings": "Configuration"
+  },
+  "profile": {
+    "name": "Thomas Peeters"
+  },
+  "dashboard": {
+    "eyebrow": "Aperçu",
+    "title": "Tableau de bord Ville - Nom",
+    "weather": {
+      "title": "Météo",
+      "temperature": "22°C",
+      "cloudStatus": "Partiellement nuageux",
+      "tomorrow": "Demain",
+      "tomorrowCloudStatus": "Légèrement nuageux",
+      "min": "min",
+      "max": "max",
+      "tomorrowMin": "16",
+      "tomorrowMax": "25°C"
+    },
+    "info": {
+      "title": "Info",
+      "today": "Aujourd'hui",
+      "peak": "Pic d'aujourd'hui",
+      "peakValue": "12:00 - 14:00",
+      "yield": "Rendement d'aujourd'hui",
+      "yieldValue": "28.4 kWh",
+      "output": "Production actuelle",
+      "outputValue": "4.8 kW"
+    },
+    "prediction": {
+      "eyebrow": "Prévision",
+      "meta": "Données de démonstration · kW",
+      "chartTitle": "Prévision de démonstration de la production solaire sur trois jours",
+      "day1": "Jour 1",
+      "day2": "Jour 2",
+      "day3": "Jour 3"
+    }
+  },
+  "pages": {
+    "models": {
+      "eyebrow": "Modèles",
+      "title": "Modèles",
+      "text": "Choisissez le modèle utilisé pour les prévisions.",
+      "listLabel": "Liste des modèles",
+      "listTitle": "Modèles disponibles",
+      "r2": "Accuracy",
+      "mse": "Offset (kW)",
+      "dataset": "Dataset",
+      "trainedOn": "Entraîné le",
+      "enabled": "Activé",
+      "disabled": "Désactivé",
+      "activateModel": "Activer {{model}}"
+    },
+    "dataManagement": {
+      "eyebrow": "Données",
+      "title": "Gestion des données",
+      "text": "Vous trouverez ici les datasets que vous avez ajoutés.",
+      "listLabel": "Liste des datasets",
+      "listTitle": "Datasets disponibles",
+      "location": "Lieu",
+      "resolution": "Résolution",
+      "rows": "Lignes",
+      "dateRange": "Période"
+    },
+    "assistant": {
+      "eyebrow": "Assistant",
+      "title": "Assistant énergie",
+      "heading": "Assistant énergie",
+      "text": "Choisissez les appareils à utiliser et recevez un créneau recommandé.",
+      "devices": {
+        "eyebrow": "Appareils",
+        "title": "Quels appareils voulez-vous utiliser ?",
+        "result": {
+          "timeWindow": "12:00 - 15:00",
+          "production": "5.8 kW",
+          "confidence": "Élevée",
+          "reason": "Cette combinaison correspond bien au pic solaire prévu aujourd'hui.",
+          "empty": "Sélectionnez au moins un appareil pour obtenir une recommandation."
+        }
+      },
+      "form": {
+        "preferredDate": "Date préférée",
+        "timeWindow": "Créneau préféré",
+        "timeOptions": {
+          "morning": "Matin",
+          "daytime": "Journée",
+          "afternoon": "Après-midi",
+          "evening": "Soir"
+        }
+      },
+      "appliances": {
+        "washingMachine": "Machine à laver",
+        "dishwasher": "Lave-vaisselle",
+        "dryer": "Sèche-linge",
+        "boiler": "Boiler"
+      },
+      "result": {
+        "eyebrow": "Recommandation",
+        "title": "Résultat",
+        "timeWindow": "Créneau recommandé",
+        "expectedProduction": "Production attendue",
+        "confidence": "Confiance"
+      },
+      "schedule": {
+        "eyebrow": "Planning",
+        "title": "Planning recommandé",
+        "empty": "Sélectionnez des appareils pour voir un planning.",
+        "washingMachine": {
+          "time": "10:30 - 12:00",
+          "note": "Démarrez assez tôt pour que le cycle se termine pendant le pic solaire."
+        },
+        "dishwasher": {
+          "time": "12:00 - 13:30",
+          "note": "Convient bien au moment de production le plus fort de la journée."
+        },
+        "dryer": {
+          "time": "13:30 - 15:00",
+          "note": "À utiliser après le lave-vaisselle, tant que la production reste élevée."
+        },
+        "boiler": {
+          "time": "11:00 - 15:00",
+          "note": "Laissez le boiler chauffer progressivement pendant les heures ensoleillées."
+        }
+      },
+      "tabs": {
+        "label": "Catégories de conseils",
+        "car": "Charger la voiture",
+        "washingMachine": "Machine à laver",
+        "dishwasher": "Lave-vaisselle",
+        "dryer": "Sèche-linge",
+        "boiler": "Boiler"
+      },
+      "advice": {
+        "car": {
+          "eyebrow": "Voiture",
+          "title": "Quand dois-je charger ma voiture ?",
+          "summary": "Chargez surtout autour de midi, quand la production solaire prévue est la plus élevée.",
+          "items": [
+            { "label": "Meilleur moment", "value": "12:00 - 15:00" },
+            { "label": "Raison", "value": "Production solaire maximale" },
+            { "label": "Conseil", "value": "Démarrer la charge après 12:00" }
+          ]
+        },
+        "washingMachine": {
+          "eyebrow": "Machine à laver",
+          "title": "Quand lancer la machine à laver ?",
+          "summary": "Planifiez la machine en fin de matinée pour que le cycle se termine pendant le pic.",
+          "items": [
+            { "label": "Meilleur moment", "value": "10:30 - 13:00" },
+            { "label": "Raison", "value": "Production en hausse" },
+            { "label": "Conseil", "value": "Utiliser le départ différé" }
+          ]
+        },
+        "dishwasher": {
+          "eyebrow": "Lave-vaisselle",
+          "title": "Quand lancer le lave-vaisselle ?",
+          "summary": "Lancez le lave-vaisselle autour de midi ou en début d'après-midi, lorsque la production solaire est suffisante.",
+          "items": [
+            { "label": "Meilleur moment", "value": "12:00 - 14:30" },
+            { "label": "Raison", "value": "Bonne production pendant un cycle court" },
+            { "label": "Conseil", "value": "Utiliser le mode éco ou le départ différé" }
+          ]
+        },
+        "dryer": {
+          "eyebrow": "Sèche-linge",
+          "title": "Quand utiliser le sèche-linge ?",
+          "summary": "Utilisez le sèche-linge juste après le pic de midi, quand la production reste forte.",
+          "items": [
+            { "label": "Meilleur moment", "value": "13:00 - 16:00" },
+            { "label": "Raison", "value": "Forte production l'après-midi" },
+            { "label": "Conseil", "value": "Éviter les heures du soir" }
+          ]
+        },
+        "boiler": {
+          "eyebrow": "Boiler",
+          "title": "Quand chauffer le boiler ?",
+          "summary": "Chauffez le boiler pendant la journée pour réduire l'énergie du réseau le soir.",
+          "items": [
+            { "label": "Meilleur moment", "value": "11:00 - 15:00" },
+            { "label": "Raison", "value": "Production solaire stable" },
+            { "label": "Conseil", "value": "Planifier la chauffe autour de midi" }
+          ]
+        }
+      }
+    }
+  },
+  "settings": {
+    "eyebrow": "Configuration",
+    "title": "Configuration",
+    "preferencesLabel": "Préférences",
+    "tabs": {
+      "label": "Onglets de configuration",
+      "installation": "Installation",
+      "consumption": "Consommation",
+      "preferences": "Préférences"
+    },
+    "installation": {
+      "title": "Installation",
+      "text": "Saisissez les informations de base de l'installation solaire.",
+      "powerTitle": "Puissance",
+      "powerText": "Indiquez la puissance crête totale de l'installation.",
+      "panelCount": "Nombre de panneaux",
+      "installationKwp": "Puissance de l'installation (kWp)"
+    },
+    "consumption": {
+      "title": "Consommation",
+      "kwh": "Consommation (kWh)",
+      "car": {
+        "title": "Charger la voiture",
+        "text": "Consommation moyenne par session de charge."
+      },
+      "washingMachine": {
+        "title": "Machine à laver",
+        "text": "Consommation moyenne par cycle de lavage."
+      },
+      "dishwasher": {
+        "title": "Lave-vaisselle",
+        "text": "Consommation moyenne par cycle de lave-vaisselle."
+      },
+      "dryer": {
+        "title": "Sèche-linge",
+        "text": "Consommation moyenne par cycle de séchage."
+      },
+      "boiler": {
+        "title": "Boiler",
+        "text": "Consommation moyenne par cycle de chauffe."
+      }
+    },
+    "appearance": {
+      "title": "Apparence",
+      "text": "Passez d'une interface claire à une vue sombre pour les environnements peu éclairés.",
+      "dark": "Mode sombre",
+      "light": "Mode clair"
+    },
+    "language": {
+      "title": "Langue",
+      "text": "Choisissez la langue de l'interface de l'application.",
+      "label": "Langue",
+      "nl": {
+        "label": "Nederlands",
+        "description": "Néerlandais"
+      },
+      "fr": {
+        "label": "Français",
+        "description": "Français"
+      },
+      "en": {
+        "label": "English",
+        "description": "Anglais"
+      }
+    }
+  },
+  "demo": {
+    "status": {
+      "ready": "Prêt"
+    },
+    "resolution": {
+      "hourly": "Horaire",
+      "fifteenMinutes": "15 minutes"
+    }
+  }
+}

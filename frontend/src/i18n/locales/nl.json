@@ -1,0 +1,271 @@
+{
+  "app": {
+    "title": "Solar Panel Assistant"
+  },
+  "navigation": {
+    "dashboard": "Dashboard",
+    "assistant": "Assistent",
+    "models": "Modellen",
+    "dataManagement": "Databeheer",
+    "settings": "Configuratie"
+  },
+  "profile": {
+    "name": "Thomas Peeters"
+  },
+  "dashboard": {
+    "eyebrow": "Overzicht",
+    "title": "Dashboard Stad - Naam",
+    "weather": {
+      "title": "Weer",
+      "temperature": "22°C",
+      "cloudStatus": "Gedeeltelijk bewolkt",
+      "tomorrow": "Morgen",
+      "tomorrowCloudStatus": "Licht bewolkt",
+      "min": "min",
+      "max": "max",
+      "tomorrowMin": "16",
+      "tomorrowMax": "25°C"
+    },
+    "info": {
+      "title": "Info",
+      "today": "Vandaag",
+      "peak": "Piek vandaag",
+      "peakValue": "12:00 - 14:00",
+      "yield": "Opbrengst vandaag",
+      "yieldValue": "28.4 kWh",
+      "output": "Huidige output",
+      "outputValue": "4.8 kW"
+    },
+    "prediction": {
+      "eyebrow": "Voorspelling",
+      "meta": "Demodata · kW",
+      "chartTitle": "Demo zonne-output voorspelling voor drie dagen",
+      "day1": "Dag 1",
+      "day2": "Dag 2",
+      "day3": "Dag 3"
+    }
+  },
+  "pages": {
+    "models": {
+      "eyebrow": "Modellen",
+      "title": "Modellen",
+      "text": "Kies welk model gebruikt wordt voor voorspellingen.",
+      "listLabel": "Modellenlijst",
+      "listTitle": "Beschikbare modellen",
+      "r2": "Accuracy",
+      "mse": "Offset (kW)",
+      "dataset": "Dataset",
+      "trainedOn": "Getraind op",
+      "enabled": "Ingeschakeld",
+      "disabled": "Uitgeschakeld",
+      "activateModel": "{{model}} inschakelen"
+    },
+    "dataManagement": {
+      "eyebrow": "Data",
+      "title": "Databeheer",
+      "text": "Hier vind je de datasets die je hebt toegevoegd.",
+      "listLabel": "Datasetlijst",
+      "listTitle": "Beschikbare datasets",
+      "location": "Locatie",
+      "resolution": "Resolutie",
+      "rows": "Rijen",
+      "dateRange": "Periode"
+    },
+    "assistant": {
+      "eyebrow": "Assistent",
+      "title": "Energieassistent",
+      "heading": "Energieassistent",
+      "text": "Kies welke toestellen je wilt gebruiken en krijg een aanbevolen tijdsvenster.",
+      "devices": {
+        "eyebrow": "Toestellen",
+        "title": "Welke toestellen wil je gebruiken?",
+        "result": {
+          "timeWindow": "12:00 - 15:00",
+          "production": "5.8 kW",
+          "confidence": "Hoog",
+          "reason": "Deze combinatie past goed binnen de verwachte zonnepiek van vandaag.",
+          "empty": "Selecteer minstens één toestel om een aanbeveling te krijgen."
+        }
+      },
+      "form": {
+        "preferredDate": "Voorkeursdatum",
+        "timeWindow": "Voorkeurstijd",
+        "timeOptions": {
+          "morning": "Ochtend",
+          "daytime": "Overdag",
+          "afternoon": "Namiddag",
+          "evening": "Avond"
+        }
+      },
+      "appliances": {
+        "washingMachine": "Wasmachine",
+        "dishwasher": "Vaatwasser",
+        "dryer": "Droogkast",
+        "boiler": "Boiler"
+      },
+      "result": {
+        "eyebrow": "Aanbeveling",
+        "title": "Resultaat",
+        "timeWindow": "Aanbevolen tijd",
+        "expectedProduction": "Verwachte productie",
+        "confidence": "Zekerheid"
+      },
+      "schedule": {
+        "eyebrow": "Planning",
+        "title": "Aanbevolen planning",
+        "empty": "Selecteer toestellen om een planning te zien.",
+        "washingMachine": {
+          "time": "10:30 - 12:00",
+          "note": "Start vroeg genoeg zodat de cyclus klaar is tijdens de zonnepiek."
+        },
+        "dishwasher": {
+          "time": "12:00 - 13:30",
+          "note": "Past goed in het sterkste productiemoment van de dag."
+        },
+        "dryer": {
+          "time": "13:30 - 15:00",
+          "note": "Gebruik na de vaatwasser, zolang de productie hoog blijft."
+        },
+        "boiler": {
+          "time": "11:00 - 15:00",
+          "note": "Laat de boiler geleidelijk opwarmen tijdens de zonnige uren."
+        }
+      },
+      "tabs": {
+        "label": "Adviescategorieën",
+        "car": "Auto laden",
+        "washingMachine": "Wasmachine",
+        "dishwasher": "Vaatwasser",
+        "dryer": "Droogkast",
+        "boiler": "Boiler"
+      },
+      "advice": {
+        "car": {
+          "eyebrow": "Auto",
+          "title": "Wanneer laad ik mijn auto?",
+          "summary": "Laad vooral rond de middag, wanneer de voorspelde zonneproductie het hoogst is.",
+          "items": [
+            { "label": "Beste moment", "value": "12:00 - 15:00" },
+            { "label": "Reden", "value": "Hoogste zonneproductie" },
+            { "label": "Advies", "value": "Start met laden na 12:00" }
+          ]
+        },
+        "washingMachine": {
+          "eyebrow": "Wasmachine",
+          "title": "Wanneer zet ik de wasmachine aan?",
+          "summary": "Plan de wasmachine in het late voormiddagblok zodat het programma klaar is tijdens de piek.",
+          "items": [
+            { "label": "Beste moment", "value": "10:30 - 13:00" },
+            { "label": "Reden", "value": "Stijgende opbrengst" },
+            { "label": "Advies", "value": "Gebruik een uitgestelde start" }
+          ]
+        },
+        "dishwasher": {
+          "eyebrow": "Vaatwasser",
+          "title": "Wanneer zet ik de vaatwasser aan?",
+          "summary": "Laat de vaatwasser draaien rond de middag of vroege namiddag, wanneer er voldoende zonneproductie is.",
+          "items": [
+            { "label": "Beste moment", "value": "12:00 - 14:30" },
+            { "label": "Reden", "value": "Goede productie tijdens korte cyclus" },
+            { "label": "Advies", "value": "Gebruik eco of uitgestelde start" }
+          ]
+        },
+        "dryer": {
+          "eyebrow": "Droogkast",
+          "title": "Wanneer gebruik ik de droogkast?",
+          "summary": "Gebruik de droogkast bij voorkeur net na de middagpiek, zolang er nog voldoende productie is.",
+          "items": [
+            { "label": "Beste moment", "value": "13:00 - 16:00" },
+            { "label": "Reden", "value": "Sterke namiddagproductie" },
+            { "label": "Advies", "value": "Vermijd de avonduren" }
+          ]
+        },
+        "boiler": {
+          "eyebrow": "Boiler",
+          "title": "Wanneer verwarm ik de boiler?",
+          "summary": "Laat de boiler overdag opwarmen, zodat hij minder netstroom nodig heeft in de avond.",
+          "items": [
+            { "label": "Beste moment", "value": "11:00 - 15:00" },
+            { "label": "Reden", "value": "Constante zonneproductie" },
+            { "label": "Advies", "value": "Plan opwarming rond de middag" }
+          ]
+        }
+      }
+    }
+  },
+  "settings": {
+    "eyebrow": "Configuratie",
+    "title": "Configuratie",
+    "preferencesLabel": "Voorkeuren",
+    "tabs": {
+      "label": "Configuratietabs",
+      "installation": "Installatie",
+      "consumption": "Verbruik",
+      "preferences": "Voorkeuren"
+    },
+    "installation": {
+      "title": "Installatie",
+      "text": "Vul de basisgegevens van de zonnepaneleninstallatie in.",
+      "powerTitle": "Vermogen",
+      "powerText": "Geef het totale piekvermogen van de installatie op.",
+      "panelCount": "Aantal panelen",
+      "installationKwp": "Installatievermogen (kWp)"
+    },
+    "consumption": {
+      "title": "Verbruik",
+      "kwh": "Verbruik (kWh)",
+      "car": {
+        "title": "Auto laden",
+        "text": "Gemiddeld verbruik per laadsessie."
+      },
+      "washingMachine": {
+        "title": "Wasmachine",
+        "text": "Gemiddeld verbruik per wasbeurt."
+      },
+      "dishwasher": {
+        "title": "Vaatwasser",
+        "text": "Gemiddeld verbruik per vaatwascyclus."
+      },
+      "dryer": {
+        "title": "Droogkast",
+        "text": "Gemiddeld verbruik per droogbeurt."
+      },
+      "boiler": {
+        "title": "Boiler",
+        "text": "Gemiddeld verbruik per verwarmingscyclus."
+      }
+    },
+    "appearance": {
+      "title": "Weergave",
+      "text": "Schakel tussen een lichte interface en een donkere weergave voor weinig licht.",
+      "dark": "Donkere modus",
+      "light": "Lichte modus"
+    },
+    "language": {
+      "title": "Taal",
+      "text": "Kies de taalvoorkeur voor de applicatie-interface.",
+      "label": "Taal",
+      "nl": {
+        "label": "Nederlands",
+        "description": "Nederlands"
+      },
+      "fr": {
+        "label": "Français",
+        "description": "Frans"
+      },
+      "en": {
+        "label": "English",
+        "description": "Engels"
+      }
+    }
+  },
+  "demo": {
+    "status": {
+      "ready": "Klaar"
+    },
+    "resolution": {
+      "hourly": "Per uur",
+      "fifteenMinutes": "15 minuten"
+    }
+  }
+}

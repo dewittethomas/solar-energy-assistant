@@ -21,8 +21,8 @@ services:
       MODEL_STORAGE_DIR: ${MODEL_STORAGE_DIR:-model_artifacts}
       UPLOAD_STORAGE_DIR: ${UPLOAD_STORAGE_DIR:-storage/uploads}
     volumes:
-      - ./${MODEL_STORAGE_DIR:-model_artifacts}:/app/${MODEL_STORAGE_DIR:-model_artifacts}
-      - ./${UPLOAD_STORAGE_DIR:-storage/uploads}:/app/${UPLOAD_STORAGE_DIR:-storage/uploads}
+      - ./api/${MODEL_STORAGE_DIR:-model_artifacts}:/app/${MODEL_STORAGE_DIR:-model_artifacts}
+      - ./api/${UPLOAD_STORAGE_DIR:-storage/uploads}:/app/${UPLOAD_STORAGE_DIR:-storage/uploads}
     restart: unless-stopped
 
   redis:
