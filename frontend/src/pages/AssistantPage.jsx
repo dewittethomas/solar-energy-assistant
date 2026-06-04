@@ -64,7 +64,11 @@ export function AssistantPage({ consumingActivities = [], datasetState, modelSta
     const today = new Date()
 
     api
-      .getThreeDayPredictions(user.installationId, today)
+      .getDashboard(user.installationId)
+      .then((dashboard) => {
+        const timezone = dashboard?.timezone || 'Europe/Brussels'
+        return api.getThreeDayPredictions(user.installationId, today, timezone)
+      })
       .then(setForecastData)
       .catch(() =>
         setForecastData({

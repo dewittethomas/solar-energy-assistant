@@ -62,7 +62,7 @@ export default function App() {
   const [isSubmittingOnboarding, setIsSubmittingOnboarding] = useState(false)
   const ActivePage = pages[activePage]
   const currentSessionUser = mapOwnerAndInstallationToSession(currentOwner, installation)
-  const datasetState = useProductionDataStatus(currentSessionUser.installationId)
+  const datasetState = useProductionDataStatus(currentSessionUser.installationId, modelState)
 
   useEffect(() => {
     function handlePopState() {

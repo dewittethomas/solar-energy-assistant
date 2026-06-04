@@ -161,7 +161,26 @@ function writeCache(cache, key, promise) {
 }
 
 function toDateInputValue(date) {
-  return date.toISOString().slice(0, 10)
+  // Use local timezone, not UTC
+  const year = date.getFullYear()
+  const month = String(date.getMonth() + 1).padStart(2, '0')
+  const day = String(date.getDate()).padStart(2, '0')
+  return `${year}-${month}-${day}`
+}
+
+function getLocalDateInTimezone(date, timezone) {
+  // Get the date in the specified timezone (as a local Date object)
+  const formatter = new Intl.DateTimeFormat('sv-SE', {
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    timeZone: timezone,
+  })
+  const parts = formatter.formatToParts(date)
+  const year = parseInt(parts.find(p => p.type === 'year').value)
+  const month = parseInt(parts.find(p => p.type === 'month').value) - 1
+  const day = parseInt(parts.find(p => p.type === 'day').value)
+  return new Date(year, month, day)
 }
 
 export const api = {
@@ -302,9 +321,9 @@ export const api = {
     return writeCache(predictionCache, cacheKey, requestPromise)
   },
 
-  getThreeDayPredictions(installationId, referenceDate = new Date()) {
-    const startDate = new Date(referenceDate)
-    const endDate = new Date(referenceDate)
+  getThreeDayPredictions(installationId, referenceDate = new Date(), timezone = 'Europe/Brussels') {
+    const startDate = getLocalDateInTimezone(referenceDate, timezone)
+    const endDate = getLocalDateInTimezone(referenceDate, timezone)
     endDate.setDate(startDate.getDate() + 2)
 
     return this.getPredictions(

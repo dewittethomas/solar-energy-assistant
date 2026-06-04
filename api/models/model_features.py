@@ -1,6 +1,6 @@
-import numpy as np
 import pandas as pd
 from pvlib import solarposition
+from feature_engine.creation import CyclicalFeatures
 
 WEATHER_COLUMNS = [
     'direct_normal_irradiance',
@@ -35,7 +35,6 @@ def generate_solar_position_data(
     longitude: float,
     timezone: str = 'Europe/Brussels',
     frequency: str = 'h',
-    include_night: bool = True,
 ) -> pd.DataFrame:
     times = pd.date_range(
         start=start_date,
@@ -57,9 +56,6 @@ def generate_solar_position_data(
         'solar_azimuth_deg': solpos['azimuth'].values,
     })
 
-    if not include_night:
-        result = result[result['solar_elevation_deg'] > 0]
-
     return result.reset_index(drop=True)
 
 def add_cyclical_time_features(df: pd.DataFrame) -> pd.DataFrame:
@@ -67,11 +63,7 @@ def add_cyclical_time_features(df: pd.DataFrame) -> pd.DataFrame:
     result['hour'] = result['timestamp'].dt.hour
     result['day_of_year'] = result['timestamp'].dt.dayofyear
 
-    hour_angle = 2 * np.pi * result['hour'] / 24
-    day_angle = 2 * np.pi * result['day_of_year'] / 365
-    result['hour_sin'] = np.sin(hour_angle)
-    result['hour_cos'] = np.cos(hour_angle)
-    result['day_of_year_sin'] = np.sin(day_angle)
-    result['day_of_year_cos'] = np.cos(day_angle)
+    cyclical = CyclicalFeatures(variables=['hour', 'day_of_year'], drop_original=True)
+    result = cyclical.fit_transform(result)
 
-    return result.drop(columns=['hour', 'day_of_year'])
+    return result

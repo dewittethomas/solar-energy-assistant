@@ -36,10 +36,9 @@ export function DashboardPage({ datasetState, installation, modelState, onNaviga
 
     async function loadDashboard() {
       try {
-        const [dashboardResult, predictionResult] = await Promise.all([
-          api.getDashboard(user.installationId),
-          api.getThreeDayPredictions(user.installationId),
-        ])
+        const dashboardResult = await api.getDashboard(user.installationId)
+        const timezone = dashboardResult?.timezone || 'Europe/Brussels'
+        const predictionResult = await api.getThreeDayPredictions(user.installationId, new Date(), timezone)
 
         setDashboard(dashboardResult)
         setForecastData(predictionResult)

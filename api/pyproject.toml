@@ -19,4 +19,5 @@ dependencies = [
     "pvlib>=0.13.1",
     "pyarrow>=20.0.0",
     "trio>=0.33.0",
+    "feature-engine>=1.6.0",
 ]

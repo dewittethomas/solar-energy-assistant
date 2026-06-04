@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { api } from '../api/client.js'
 
-export function useProductionDataStatus(installationId) {
+export function useProductionDataStatus(installationId, refreshTrigger) {
   const [state, setState] = useState({
     datasets: [],
     hasProductionData: false,
@@ -41,7 +41,7 @@ export function useProductionDataStatus(installationId) {
     return () => {
       isMounted = false
     }
-  }, [installationId])
+  }, [installationId, refreshTrigger])
 
   return state
 }

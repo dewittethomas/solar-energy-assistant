@@ -218,7 +218,12 @@ class TrainingService:
         )
 
     def _read_solar_power_data(self, df: pd.DataFrame) -> pd.DataFrame:
-        df = df[['timestamp', 'power_kw']].copy()
+        # Preserve installation_id if it exists for later registration
+        columns_to_keep = ['timestamp', 'power_kw']
+        if 'installation_id' in df.columns:
+            columns_to_keep.insert(0, 'installation_id')
+        
+        df = df[columns_to_keep].copy()
         df['timestamp'] = pd.to_datetime(df['timestamp'], errors='coerce')
         df['solar_power_w'] = pd.to_numeric(
             df['power_kw'],
@@ -226,9 +231,13 @@ class TrainingService:
         ) * 1000
         df = df.dropna(subset=['timestamp', 'solar_power_w'])
 
+        groupby_cols = ['timestamp']
+        if 'installation_id' in df.columns:
+            groupby_cols.insert(0, 'installation_id')
+
         return (
             df
-            .groupby('timestamp', as_index=False)['solar_power_w']
+            .groupby(groupby_cols, as_index=False)['solar_power_w']
             .mean()
             .sort_values('timestamp')
             .reset_index(drop=True)
@@ -343,6 +352,9 @@ class TrainingService:
 
         if df.empty:
             raise ValueError('No matching solar and weather timestamps found')
+
+        # Filter out rows where GHI (shortwave_radiation) is zero or missing
+        df = df[df['shortwave_radiation'] > 0]
 
         df = add_cyclical_time_features(df)
 
