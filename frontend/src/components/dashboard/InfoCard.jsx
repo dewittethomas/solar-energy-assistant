@@ -31,7 +31,7 @@ export function InfoCard({ items }) {
             <div key={item.labelKey}>
               <ItemIcon size={20} strokeWidth={2.2} />
               <span>{t(item.labelKey)}</span>
-              <strong>{t(item.valueKey)}</strong>
+              <strong>{item.value || t(item.valueKey)}</strong>
             </div>
           )
         })}

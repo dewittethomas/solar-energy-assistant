@@ -15,26 +15,15 @@ class Settings(BaseSettings):
 
     model_storage_dir: Path = PROJECT_ROOT / 'model_artifacts'
     upload_storage_dir: Path = PROJECT_ROOT / 'storage/uploads'
+    sqlite_db_path: Path = PROJECT_ROOT / 'storage/app.db'
     minimum_model_r2: float = 0.5
 
     redis_host: str = 'redis'
     redis_port: int = 6379
-    postgres_host: str = '127.0.0.1'
-    postgres_port: int = 5432
-    postgres_user: str = 'postgres'
-    postgres_password: str = 'postgres'
-    postgres_db: str = 'solar_energy_assistant'
     adminer_port: int = 8080
     cors_allowed_origins: str = (
         'http://localhost:5173,http://127.0.0.1:5173'
     )
-
-    @property
-    def database_url(self) -> str:
-        return (
-            f'postgresql://{self.postgres_user}:{self.postgres_password}'
-            f'@{self.postgres_host}:{self.postgres_port}/{self.postgres_db}'
-        )
 
     @property
     def cors_origins(self) -> list[str]:
@@ -47,6 +36,7 @@ class Settings(BaseSettings):
     @field_validator(
         'model_storage_dir',
         'upload_storage_dir',
+        'sqlite_db_path',
         mode='after'
     )
     @classmethod

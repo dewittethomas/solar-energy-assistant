@@ -84,17 +84,22 @@ class ModelTrainingPipeline:
 
     def train_model_from_parquet(
         self,
+        training_run_id: str,
         parquet_path: Path,
         optimize: bool = False,
         n_trials: int = 50,
         activate_model: bool = False
     ) -> ModelTrainingResult:
         return self._training_service.train_from_parquet(
+            training_run_id=training_run_id,
             parquet_path=parquet_path,
             optimize=optimize,
             n_trials=n_trials,
             activate_model=activate_model
         )
+
+    def queue_training_run(self, parquet_path: Path) -> dict[str, object]:
+        return self._training_service.queue_training_run(parquet_path)
 
 _pipeline = CsvPreprocessingPipeline()
 

@@ -1,30 +1,138 @@
 {
   "app": {
-    "title": "Solar Panel Assistant"
+    "title": "SolarWise"
   },
   "navigation": {
-    "dashboard": "Dashboard",
-    "assistant": "Assistant",
-    "models": "Models",
-    "dataManagement": "Data Management",
-    "settings": "Configuration"
+    "dashboard": "Overview",
+    "forecasts": "Forecast",
+    "assistant": "Planner",
+    "analysis": "Production History",
+    "recommendations": "Recommendations",
+    "datasets": "Data Uploads",
+    "predictionModel": "AI Model",
+    "settings": "Settings",
+    "advanced": "Advanced"
   },
   "profile": {
-    "name": "Thomas Peeters"
+    "name": "John Doe"
+  },
+  "countries": {
+    "BE": "Belgium",
+    "NL": "Netherlands",
+    "LU": "Luxembourg",
+    "DE": "Germany"
+  },
+  "common": {
+    "today": "Today",
+    "tomorrow": "Tomorrow",
+    "dayAfterTomorrow": "Day after tomorrow",
+    "now": "Now",
+    "windowPassed": "Best window has passed",
+    "cancel": "Cancel",
+    "noProductionData": {
+      "title": "No production data available yet",
+      "text": "Upload production data first to view forecasts, analysis, and planning."
+    }
+  },
+  "weather": {
+    "labels": {
+      "clear": "Clear",
+      "sunny": "Sunny",
+      "partlyCloudy": "Partly cloudy",
+      "cloudy": "Cloudy",
+      "rain": "Rain",
+      "lightRain": "Light rain",
+      "overcast": "Overcast"
+    }
+  },
+  "seasons": {
+    "winter": "Winter",
+    "spring": "Spring",
+    "summer": "Summer",
+    "autumn": "Autumn"
+  },
+  "login": {
+    "eyebrow": "Welcome",
+    "title": "SolarWise",
+    "subtitle": "Create your profile to get started.",
+    "owner": {
+      "stepLabel": "Step 1 of 2",
+      "title": "Personal profile",
+      "text": "Fill in your name to continue.",
+      "subtitle": "Create your profile to get started.",
+      "firstName": "First name *",
+      "lastName": "Last name *",
+      "submit": "Next"
+    },
+    "installation": {
+      "stepLabel": "Step 2 of 2",
+      "title": "Your installation",
+      "text": "Enter your location so SolarWise can use weather and solar data.",
+      "subtitle": "Enter your location so SolarWise can use weather and solar data.",
+      "requiredLegend": "* Required field",
+      "name": "Installation name *",
+      "city": "City *",
+      "cityPlaceholder": "e.g. Bruges",
+      "country": "Country *",
+      "panelCount": "Panel count",
+      "capacityKwp": "Installation capacity (kWp)",
+      "optionalHelp": "Panel count and installation capacity are optional. You can update them later in Settings.",
+      "submit": "Create installation"
+    }
   },
   "dashboard": {
     "eyebrow": "Overview",
-    "title": "Dashboard City - Name",
+    "title": "Overview",
+    "action": {
+      "eyebrow": "Recommendation",
+      "title": "Next best production window",
+      "bestWindow": "Best production window",
+      "expectedProduction": "Expected production",
+      "expectedOutputNow": "Expected output now",
+      "viewForecast": "View Forecast",
+      "openRecommendations": "View recommendations",
+      "suggestedAppliances": "Suggested appliances",
+      "suggestedAppliancesValue": "Washing machine, boiler",
+      "appliances": {
+        "washingMachine": "Washing machine",
+        "boiler": "Boiler"
+      },
+      "openPlanner": "Open planner"
+    },
+    "installation": {
+      "title": "Installation",
+      "panelsUnit": "panels",
+      "profileFallback": "Installation profile",
+      "powerOptional": "kWp optional",
+      "active": "Installation active"
+    },
+    "forecastStatus": {
+      "title": "Forecast status"
+    },
+    "invalidForecast": {
+      "title": "This forecast seems invalid.",
+      "text": "Check the production unit of your dataset or retrain the model.",
+      "ctaTitle": "Check your dataset",
+      "cta": "Check dataset",
+      "capacityLabel": "Installation capacity"
+    },
+    "bottom": {
+      "title": "Recommendations and planning",
+      "recommendationEyebrow": "Recommendation",
+      "recommendationTitle": "Recommendation",
+      "applianceEyebrow": "Planning",
+      "applianceTitle": "Appliance planning"
+    },
     "weather": {
       "title": "Weather",
-      "temperature": "22°C",
+      "temperature": "22 °C",
       "cloudStatus": "Partly cloudy",
       "tomorrow": "Tomorrow",
       "tomorrowCloudStatus": "Lightly cloudy",
       "min": "min",
       "max": "max",
       "tomorrowMin": "16",
-      "tomorrowMax": "25°C"
+      "tomorrowMax": "25 °C"
     },
     "info": {
       "title": "Info",
@@ -33,64 +141,285 @@
       "peakValue": "12:00 - 14:00",
       "yield": "Today's yield",
       "yieldValue": "28.4 kWh",
-      "output": "Current output",
+      "output": "Expected output now",
       "outputValue": "4.8 kW"
     },
     "prediction": {
-      "eyebrow": "Prediction",
-      "meta": "Demo data · kW",
-      "chartTitle": "Demo solar output prediction for three days",
+      "eyebrow": "Forecast",
+      "meta": "kW",
+      "chartTitle": "Expected energy production",
+      "xAxis": "Date / Time",
+      "yAxis": "Production ({{unit}})",
+      "tooltipLabel": "Predicted production:",
+      "forecast": "Forecast",
       "day1": "Day 1",
       "day2": "Day 2",
       "day3": "Day 3"
+    },
+    "empty": {
+      "text": "Upload production data first to view forecasts, analysis, and planning."
     }
   },
   "pages": {
+    "forecasts": {
+      "eyebrow": "Forecast",
+      "title": "Solar forecast",
+      "bestWindow": "Best production window",
+      "weather": "Weather",
+      "weatherImpact": "Weather impact",
+      "weatherImpactValue": "Lightly cloudy",
+      "productionReduction": "Estimated production reduction: 8%",
+      "tomorrow": "Tomorrow",
+      "empty": {
+        "text": "Upload production data first to view forecasts, analysis, and planning."
+      }
+    },
+    "analysis": {
+      "eyebrow": "Production History",
+      "title": "Production History",
+      "heading": "How is your installation performing?",
+      "text": "Understand past solar production patterns from your uploaded datasets.",
+      "monthlyChart": "Average monthly yield",
+      "monthlyChartSubtitle": "Average yield per month based on your uploaded data.",
+      "seasonalChart": "Average seasonal yield",
+      "seasonalChartSubtitle": "Average yield per season based on your uploaded data.",
+      "productionAxis": "Production ({{unit}})",
+      "averageProductionAxis": "Average yield ({{unit}})",
+      "monthAxis": "Month",
+      "seasonAxis": "Season",
+      "selectorLabel": "Period",
+      "range": {
+        "all": "All months",
+        "recent": "Recent months"
+      },
+      "aiInsights": "Production insights",
+      "aiText": "A quick read of the strongest production patterns.",
+      "bestProductionWindow": "Best production window",
+      "bestProductionMonth": "Best production month",
+      "bestMonthValue": "May",
+      "peakProductionHour": "Peak production hour",
+      "strongestSeason": "Strongest season",
+      "strongestSeasonValue": "Summer",
+      "summerWinterDifference": "Summer vs winter",
+      "loading": "Loading production history...",
+      "empty": {
+        "title": "No production history yet",
+        "text": "Upload a dataset first to view monthly and seasonal trends."
+      },
+      "detailsTitle": "Details",
+      "details": {
+        "datasetBasis": "Basis",
+        "datasetBasisValue": "Uploaded production dataset",
+        "timeWindow": "Period",
+        "trendType": "Type",
+        "trendTypeValue": "Production trends"
+      }
+    },
+    "recommendations": {
+      "eyebrow": "Recommendations",
+      "title": "Recommendations",
+      "heading": "Smart actions for today",
+      "text": "Small choices that help you use more solar energy yourself.",
+      "items": {
+        "washingMachine": {
+          "title": "Run washing machine",
+          "appliance": "Washing machine",
+          "windowLabel": "Best window",
+          "window": "12:00 - 15:00",
+          "reason": "Highest predicted solar production",
+          "productionContext": "Inside the strongest expected production period"
+        },
+        "dishwasher": {
+          "title": "Delay dishwasher",
+          "appliance": "Dishwasher",
+          "windowLabel": "Recommended",
+          "window": "Tomorrow 13:00",
+          "reason": "Tomorrow's forecast is better",
+          "productionContext": "Tomorrow has a stronger expected production window"
+        }
+      },
+      "cardLabel": "Recommendation",
+      "appliance": "Appliance",
+      "reason": "Reason",
+      "productionContext": "Production context",
+      "openAssistant": "Open Assistant",
+      "priority": {
+        "high": "High Impact",
+        "medium": "Medium Impact",
+        "low": "Low Impact"
+      }
+    },
     "models": {
-      "eyebrow": "Models",
-      "title": "Models",
-      "text": "Choose which model is used for predictions.",
-      "listLabel": "Models list",
-      "listTitle": "Available models",
-      "r2": "Accuracy",
-      "mse": "Offset (kW)",
+      "eyebrow": "Advanced",
+      "title": "AI Model",
+      "text": "See which model is used for your forecasts.",
+      "listLabel": "AI model overview",
+      "listTitle": "Available AI models",
+      "activeTitle": "Active AI model",
+      "comparisonTitle": "Model comparison",
+      "comparisonText": "Compare available models without putting technical details first.",
+      "r2": "Prediction accuracy",
+      "accuracyColumn": "Accuracy",
+      "r2Score": "R² score",
+      "mse": "Average prediction error",
       "dataset": "Dataset",
+      "datasetFriendly": "Production dataset",
+      "notAvailable": "Not available yet",
+      "hiddenDataset": "Advanced details",
       "trainedOn": "Trained on",
-      "enabled": "Enabled",
-      "disabled": "Disabled",
-      "activateModel": "Enable {{model}}"
+      "enabled": "Active",
+      "disabled": "Use model",
+      "activateModel": "Enable {{model}}",
+      "compareModels": "Compare Models",
+      "accuracyHelpTitle": "Prediction accuracy",
+      "accuracyHelp": "The closer to 1, the better.",
+      "errorHelpTitle": "Average prediction error",
+      "errorHelp": "Average difference between predicted and actual production.",
+      "table": {
+        "model": "Model",
+        "status": "Status"
+      },
+      "advanced": {
+        "title": "Advanced details",
+        "trainingDate": "Training date",
+        "metadata": "Model metadata",
+        "version": "Version information"
+      },
+      "empty": {
+        "text": "Upload production data first to view forecasts, analysis, and planning."
+      }
     },
     "dataManagement": {
-      "eyebrow": "Data",
-      "title": "Data Management",
-      "text": "Here you can find the datasets you added.",
+      "eyebrow": "Datasets",
+      "title": "Datasets",
+      "text": "Manage the CSV files used to create recommendations and forecasts.",
+      "loading": "Loading datasets...",
       "listLabel": "Datasets list",
-      "listTitle": "Available datasets",
+      "listTitle": "Your datasets",
       "location": "Location",
-      "resolution": "Resolution",
       "rows": "Rows",
-      "dateRange": "Date range"
+      "dateRange": "Date range",
+      "retrain": "Retrain model",
+      "retraining": "Starting training...",
+      "retrainFailed": "We could not start training.",
+      "table": {
+        "dataset": "Dataset",
+        "status": "Status",
+        "action": "Action"
+      },
+      "advanced": {
+        "title": "Advanced details",
+        "originalFile": "Original filename",
+        "originalColumns": "Original columns",
+        "dateColumn": "Selected date column",
+        "measurementColumn": "Selected production column",
+        "unit": "Production unit",
+        "internalColumns": "Standardized columns",
+        "storage": "Internal storage",
+        "hash": "Dataset hash",
+        "uploaded": "Uploaded",
+        "columns": "Detected columns"
+      },
+      "empty": {
+        "title": "No datasets yet",
+        "text": "Upload a CSV file to enable forecasts, recommendations, and performance insights.",
+        "benefits": {
+          "forecasts": "Generate forecasts",
+          "recommendations": "Receive recommendations",
+          "analysis": "Review production history"
+        }
+      },
+      "upload": {
+        "button": "Upload dataset",
+        "title": "Upload dataset",
+        "dropTitle": "Drop CSV here",
+        "browse": "or click to browse",
+        "format": "Supported format: CSV with Date, Time, Production.",
+        "invalidType": "Please use a CSV file.",
+        "invalid": "We could not validate this file.",
+        "valid": "Dataset accepted.",
+        "validWithColumns": "Detected columns: {{date}} and {{measurement}}.",
+        "missingProduction": "Missing production column.",
+        "mappingMissing": "We could not automatically detect the date or production column.",
+        "uploading": "Uploading dataset...",
+        "uploadingShort": "Uploading...",
+        "success": "Dataset was added.",
+        "uploadedSuccessfully": "Dataset uploaded successfully.",
+        "alreadyUploaded": "This dataset was already uploaded.",
+        "failed": "Upload failed.",
+        "confirm": "Add dataset",
+        "productionUnitHelp": "Is your production measured in W, kW, Wh, or kWh?",
+        "columns": "Detected columns",
+        "stateWarning": "Dataset already exists",
+        "duplicateTitle": "This dataset already exists",
+        "duplicateText": "SolarWise recognizes this file as a dataset that was added earlier.",
+        "existingDataset": "Existing dataset:",
+        "useExisting": "Use existing dataset",
+        "chooseDifferent": "Choose another file"
+      }
     },
     "assistant": {
       "eyebrow": "Assistant",
-      "title": "Energy Assistant",
-      "heading": "Energy Assistant",
-      "text": "Choose which devices you want to run and get a recommended time window.",
+      "title": "Smart planner",
+      "heading": "Smart planner",
+      "text": "Choose appliances, adjust their usage and duration, and plan them around expected solar production.",
+      "intentLabel": "Assistant choices",
+      "guided": {
+        "eyebrow": "Suggestion"
+      },
+      "intents": {
+        "useSolar": {
+          "title": "Use more solar energy",
+          "text": "Find the best moment based on expected solar production.",
+          "recommendation": "Plan larger appliances between 12:00 and 15:00. That is when expected solar production is strongest."
+        },
+        "reduceCosts": {
+          "title": "Reduce costs",
+          "text": "Avoid expensive or inefficient moments.",
+          "recommendation": "Move flexible appliances to sunny hours and avoid heavy appliances in the evening."
+        },
+        "scheduleAppliances": {
+          "title": "Schedule appliances",
+          "text": "Choose devices and get a schedule.",
+          "recommendation": "Select appliances to create a concrete schedule."
+        },
+        "prepareTomorrow": {
+          "title": "Prepare for tomorrow",
+          "text": "See what is worth saving for tomorrow.",
+          "recommendation": "If an appliance is not urgent, save it for tomorrow's strongest solar window."
+        },
+        "analyzeProduction": {
+          "title": "Review performance",
+          "text": "Review patterns from your uploaded datasets.",
+          "recommendation": "Review past production patterns to spot changes in peak output more quickly."
+        }
+      },
       "devices": {
-        "eyebrow": "Devices",
-        "title": "Which devices do you want to run?",
+        "eyebrow": "Appliances",
+        "title": "Which appliances do you want to run?",
+        "usage": "kWh",
+        "duration": "Duration (min)",
+        "customName": "Custom appliance",
+        "addCustom": "Add",
+        "edit": "Edit",
+        "save": "Done",
         "result": {
           "timeWindow": "12:00 - 15:00",
-          "production": "5.8 kW",
-          "confidence": "High",
+          "production": "5.8 kWh",
+          "productionContext": "Good moment",
           "reason": "This combination fits well within today's expected solar peak.",
-          "empty": "Select at least one device to get a recommendation."
+          "empty": "Select at least one appliance to get a recommendation."
         }
       },
       "form": {
+        "title": "Planning",
         "preferredDate": "Preferred date",
         "timeWindow": "Preferred time window",
         "timeOptions": {
+          "auto": "Let SolarWise choose",
+          "today": "Today",
+          "tomorrow": "Tomorrow",
+          "dayAfterTomorrow": "Day after tomorrow",
           "morning": "Morning",
           "daytime": "Daytime",
           "afternoon": "Afternoon",
@@ -101,19 +430,40 @@
         "washingMachine": "Washing machine",
         "dishwasher": "Dishwasher",
         "dryer": "Dryer",
-        "boiler": "Boiler"
+        "boiler": "Boiler",
+        "oven": "Oven",
+        "evCharging": "Charge electric car",
+        "laptopCharging": "Charge laptop"
       },
       "result": {
         "eyebrow": "Recommendation",
         "title": "Result",
         "timeWindow": "Recommended time window",
         "expectedProduction": "Expected production",
-        "confidence": "Confidence"
+        "productionContext": "Production context",
+        "productionContextValue": "Fits the expected solar peak"
       },
       "schedule": {
         "eyebrow": "Schedule",
         "title": "Recommended schedule",
-        "empty": "Select devices to see a schedule.",
+        "selectedLabel": "Recommended plan",
+        "alternativesLabel": "Planner overview",
+        "alternativesTitle": "Other suitable moments",
+        "bestPlanTitle": "Best schedule",
+        "bestWindow": "Best window",
+        "empty": "Select appliances to see a schedule.",
+        "recommendedTitle": "Recommended plan",
+        "durationLabel": "Duration",
+        "expectedProductionWindow": "Expected production during this window",
+        "averageProductionLabel": "Average production",
+        "selectedBadge": "Chosen",
+        "noSuitableMoment": "No suitable moment left",
+        "notSelectedDay": "No plan for this day",
+        "planner": {
+          "title": "3-day planner",
+          "empty": "No suitable window found yet.",
+          "passed": "Best window has passed"
+        },
         "washingMachine": {
           "time": "10:30 - 12:00",
           "note": "Start early enough so the cycle finishes during the solar peak."
@@ -129,76 +479,37 @@
         "boiler": {
           "time": "11:00 - 15:00",
           "note": "Let the boiler heat gradually during sunny hours."
-        }
+        },
+        "expectedProduction": "Expected production"
       },
-      "tabs": {
-        "label": "Advice categories",
-        "car": "Car charging",
-        "washingMachine": "Washing machine",
-        "dishwasher": "Dishwasher",
-        "dryer": "Dryer",
-        "boiler": "Boiler"
+      "getRecommendation": "Get Recommendation",
+      "loadingRecommendation": "Getting recommendation...",
+      "summary": {
+        "selected": "{{count}} selected appliances",
+        "usage": "{{value}} kWh total usage",
+        "duration": "{{value}} total duration"
       },
-      "advice": {
-        "car": {
-          "eyebrow": "Car",
-          "title": "When should I charge my car?",
-          "summary": "Charge around midday, when the predicted solar production is highest.",
-          "items": [
-            { "label": "Best time", "value": "12:00 - 15:00" },
-            { "label": "Reason", "value": "Highest solar production" },
-            { "label": "Advice", "value": "Start charging after 12:00" }
-          ]
-        },
-        "washingMachine": {
-          "eyebrow": "Washing machine",
-          "title": "When should I run the washing machine?",
-          "summary": "Schedule the washing machine late in the morning so the cycle finishes during the peak.",
-          "items": [
-            { "label": "Best time", "value": "10:30 - 13:00" },
-            { "label": "Reason", "value": "Rising production" },
-            { "label": "Advice", "value": "Use delayed start" }
-          ]
-        },
-        "dishwasher": {
-          "eyebrow": "Dishwasher",
-          "title": "When should I run the dishwasher?",
-          "summary": "Run the dishwasher around midday or early afternoon, when solar production is strong enough.",
-          "items": [
-            { "label": "Best time", "value": "12:00 - 14:30" },
-            { "label": "Reason", "value": "Good production during a short cycle" },
-            { "label": "Advice", "value": "Use eco mode or delayed start" }
-          ]
-        },
-        "dryer": {
-          "eyebrow": "Dryer",
-          "title": "When should I use the dryer?",
-          "summary": "Use the dryer just after the midday peak, while production is still strong.",
-          "items": [
-            { "label": "Best time", "value": "13:00 - 16:00" },
-            { "label": "Reason", "value": "Strong afternoon production" },
-            { "label": "Advice", "value": "Avoid evening hours" }
-          ]
-        },
-        "boiler": {
-          "eyebrow": "Boiler",
-          "title": "When should I heat the boiler?",
-          "summary": "Heat the boiler during the day so it needs less grid energy in the evening.",
-          "items": [
-            { "label": "Best time", "value": "11:00 - 15:00" },
-            { "label": "Reason", "value": "Steady solar production" },
-            { "label": "Advice", "value": "Plan heating around midday" }
-          ]
-        }
+      "modal": {
+        "name": "Name",
+        "usage": "Estimated usage",
+        "duration": "Duration",
+        "save": "Save",
+        "add": "Add"
+      },
+      "empty": {
+        "text": "Upload production data first to view forecasts, analysis, and planning."
+      },
+      "timeAwareness": {
+        "todayPassed": "The best window for today has passed. SolarWise suggests tomorrow."
       }
     }
   },
   "settings": {
-    "eyebrow": "Configuration",
-    "title": "Configuration",
+    "eyebrow": "Settings",
+    "title": "Settings",
     "preferencesLabel": "Preferences",
     "tabs": {
-      "label": "Configuration tabs",
+      "label": "Settings tabs",
       "installation": "Installation",
       "consumption": "Consumption",
       "preferences": "Preferences"
@@ -206,14 +517,55 @@
     "installation": {
       "title": "Installation",
       "text": "Enter the basic details of the solar panel installation.",
+      "name": "Installation name",
+      "namePlaceholder": "Home installation",
       "powerTitle": "Power",
       "powerText": "Enter the total peak power of the installation.",
       "panelCount": "Number of panels",
-      "installationKwp": "Installation power (kWp)"
+      "installationKwp": "Installation power (kWp)",
+        "panelPlaceholder": "e.g. 12",
+        "powerPlaceholder": "e.g. 4.8",
+        "optionalTitle": "Optional details",
+      "locationTitle": "Location",
+      "locationText": "Used to make weather-aware recommendations.",
+      "location": "Location",
+      "city": "City",
+      "cityPlaceholder": "e.g. Bruges",
+      "country": "Country"
     },
     "consumption": {
       "title": "Consumption",
+      "tableTitle": "My appliances",
+      "tableText": "Manage your appliances and only adjust usage when needed.",
+      "addDevice": "Add appliance",
+      "edit": "Edit",
+      "editTitle": "Edit appliance",
+      "editText": "Adjust name, category, usage and status.",
+      "columns": {
+        "device": "Appliance",
+        "category": "Category",
+        "usage": "Usage",
+        "duration": "Duration",
+        "status": "Status",
+        "actions": "Actions"
+      },
+      "categories": {
+        "laundry": "Laundry",
+        "kitchen": "Kitchen",
+        "heating": "Hot water",
+        "mobility": "Mobility",
+        "electronics": "Electronics",
+        "other": "Other"
+      },
       "kwh": "Consumption (kWh)",
+      "duration": "Duration (min)",
+      "enabled": "Selected",
+      "disabled": "Not selected",
+      "customTitle": "Custom activity",
+      "customText": "Add an activity that is not in the default suggestions.",
+      "customName": "Activity name",
+      "addCustom": "Add activity",
+      "remove": "Remove",
       "car": {
         "title": "Car charging",
         "text": "Average consumption per charging session."
@@ -250,18 +602,98 @@
         "description": "Dutch"
       },
       "fr": {
-        "label": "Français",
+        "label": "Francais",
         "description": "French"
       },
       "en": {
         "label": "English",
         "description": "English"
       }
+    },
+    "preferences": {
+      "strategyTitle": "Recommendation strategy",
+      "strategyText": "Choose how the assistant should prioritize suggestions.",
+      "recommendationStrategy": "Strategy",
+      "preferredUsage": "Preferred appliance usage",
+      "strategyOptions": {
+        "solar": "Maximize solar usage",
+        "cost": "Reduce costs",
+        "balanced": "Balanced"
+      },
+      "usageOptions": {
+        "morning": "Morning",
+        "afternoon": "Afternoon",
+        "evening": "Evening",
+        "flexible": "Flexible"
+      }
+    },
+    "saveChanges": "Save Changes",
+    "saving": "Saving...",
+    "saved": "Changes saved",
+    "unsaved": "Settings are saved automatically",
+    "developer": {
+      "title": "Developer mode",
+      "text": "Use local maintenance actions for testing and reset tasks.",
+      "enabled": "Developer mode enabled",
+      "disabled": "Developer mode disabled",
+      "warning": "These actions remove local data and are only meant for development.",
+      "working": "Working...",
+      "deleteOwner": "Delete owner",
+      "resetDatabase": "Reset local database"
     }
   },
-  "demo": {
+  "training": {
+    "eyebrow": "Analysis",
+    "title": "SolarWise is analyzing your production data",
+    "subtitle": "We are building a forecast based on your installation.",
+    "currentPhase": "{{phase}}",
+    "progress": "Progress",
+    "technicalDetails": "Technical details",
+    "trialLabel": "Optuna",
+    "trialValue": "Trial {{current}} of {{total}}",
+    "bestRmse": "Best RMSE",
+    "pollingError": "Status polling",
+    "phases": {
+      "queued": "Waiting for processing",
+      "validating_dataset": "Checking production data",
+      "preparing_features": "Preparing features",
+      "optimizing": "Optimizing model",
+      "training_final_model": "Training final model",
+      "evaluating": "Evaluating model",
+      "saving_model": "Saving model",
+      "completed": "Ready",
+      "failed": "Failed"
+    },
+    "completed": {
+      "title": "Your forecast is ready",
+      "text": "SolarWise has analyzed your production data. You can now plan appliances based on expected production.",
+      "openPlanner": "Open planner",
+      "overview": "Go to overview"
+    },
+    "failed": {
+      "title": "We could not process your production data.",
+      "text": "Check your CSV file and try again.",
+      "retry": "Upload again",
+      "backToUploads": "Back to data uploads"
+    },
+    "guard": {
+      "title": "SolarWise is processing your production data",
+      "text": "Forecasts and planning will be available once the analysis is ready.",
+      "button": "View progress"
+    },
+    "errorCodes": {
+      "missing_columns": "Required columns are missing from the CSV file.",
+      "invalid_format": "The CSV file does not match the expected format.",
+      "training_failed": "Model training failed.",
+      "dataset_validation_failed": "The production data could not be validated."
+    }
+  },
+  "datasetMeta": {
     "status": {
-      "ready": "Ready"
+      "ready": "Ready",
+      "processing": "Processing",
+      "error": "Error",
+      "used": "Used for recommendations"
     },
     "resolution": {
       "hourly": "Hourly",

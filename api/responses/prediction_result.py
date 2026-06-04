@@ -1,16 +1,12 @@
-from datetime import date, time
+from datetime import datetime
 
 from pydantic import BaseModel
 
-class HourlyPredictionResult(BaseModel):
-    hour: time
+class PredictionPointResult(BaseModel):
+    timestamp: datetime
     value: float
 
-class DailyPredictionResult(BaseModel):
-    day: date
-    average: float
-    predictions: list[HourlyPredictionResult]
-
 class PredictionResult(BaseModel):
+    unit: str = 'W'
     total_average: float
-    predictions: list[DailyPredictionResult]
+    predictions: list[PredictionPointResult]

@@ -230,3 +230,4 @@ __marimo__/
 .streamlit/secrets.toml
 
 *.ipynb
+catboost_info

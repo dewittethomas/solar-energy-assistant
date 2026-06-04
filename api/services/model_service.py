@@ -27,10 +27,40 @@ class ModelService:
         return self.repository.get(model_id)
 
     def list_model_metrics(self, model_id: str) -> list[dict[str, object]] | None:
-        if not self.get_model(model_id):
+        model = self.get_model(model_id)
+
+        if not model:
             return None
 
-        return self.repository.list_metrics(model_id)
+        metrics = self.repository.list_metrics(model_id)
+        created_at = str(model['created_at'])
+
+        if model.get('accuracy') is not None:
+            metrics.append({
+                'id': f'{model_id}:accuracy',
+                'model_id': model_id,
+                'metric_name': 'accuracy',
+                'metric_value': model['accuracy'],
+                'created_at': created_at,
+                'accuracy': model['accuracy'],
+                'offset_kw': model.get('offset_kw')
+            })
+
+        if model.get('offset_kw') is not None:
+            metrics.append({
+                'id': f'{model_id}:offset_kw',
+                'model_id': model_id,
+                'metric_name': 'offset_kw',
+                'metric_value': model['offset_kw'],
+                'created_at': created_at,
+                'accuracy': model.get('accuracy'),
+                'offset_kw': model['offset_kw']
+            })
+
+        return metrics
+
+    def activate_model(self, model_id: str) -> dict[str, object] | None:
+        return self.repository.activate(model_id)
 
     def get_active_model(
         self,

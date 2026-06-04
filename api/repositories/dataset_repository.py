@@ -10,9 +10,14 @@ class DatasetRepository:
     def list_datasets(
         self,
         limit: int = 100,
-        offset: int = 0
+        offset: int = 0,
+        installation_id: str | None = None
     ) -> list[dict[str, object]]:
-        return self.metadata_repository.list_datasets(limit, offset)
+        return self.metadata_repository.list_datasets(
+            limit,
+            offset,
+            installation_id
+        )
 
     def get(self, dataset_id: str) -> dict[str, object] | None:
         return self.metadata_repository.get_dataset(dataset_id)

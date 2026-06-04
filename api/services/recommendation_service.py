@@ -4,7 +4,10 @@ from zoneinfo import ZoneInfo
 
 from models.recommendation import UsageWindowRecommendationRequest
 from responses.prediction_result import PredictionResult
-from responses.recommendation_result import UsageWindowRecommendationResult
+from responses.recommendation_result import (
+    DeviceScheduleResult,
+    UsageWindowRecommendationResult,
+)
 from services.prediction_service import PredictionService
 
 @dataclass(frozen=True)
@@ -33,8 +36,7 @@ class RecommendationService:
         self,
         request: UsageWindowRecommendationRequest
     ) -> UsageWindowRecommendationResult:
-        start = self._to_local_naive(request.start)
-        end = self._to_local_naive(request.end)
+        start, end = self._resolve_request_window(request)
         self._validate_request_window(start, end)
         predictions = self.prediction_service.predict_solar_yield(
             installation_id=request.installation_id,
@@ -44,7 +46,8 @@ class RecommendationService:
         slots = self._build_slots(predictions, start, end)
         candidates = self._build_candidates(slots)
         candidate = self._select_candidate(
-            candidates
+            candidates,
+            request,
         )
 
         return self._build_result(
@@ -52,6 +55,26 @@ class RecommendationService:
             start,
             end,
             candidate
+        )
+
+    def _resolve_request_window(
+        self,
+        request: UsageWindowRecommendationRequest
+    ) -> tuple[datetime, datetime]:
+        start = request.start or request.preferred_start
+        end = request.end or request.preferred_end
+
+        if start and end:
+            return self._to_local_naive(start), self._to_local_naive(end)
+
+        if request.date:
+            return (
+                datetime.combine(request.date, datetime.min.time()),
+                datetime.combine(request.date, datetime.max.time())
+            )
+
+        raise ValueError(
+            'Provide start/end, preferred_start/preferred_end, or date'
         )
 
     def _validate_request_window(
@@ -70,28 +93,27 @@ class RecommendationService:
     ) -> list[PredictionSlot]:
         slots = []
 
-        for day in predictions.predictions:
-            for prediction in day.predictions:
-                slot_start = datetime.combine(day.day, prediction.hour)
-                slot_end = slot_start + timedelta(hours=1)
-                clipped_start = max(slot_start, start)
-                clipped_end = min(slot_end, end)
+        for prediction in predictions.predictions:
+            slot_start = prediction.timestamp
+            slot_end = slot_start + timedelta(hours=1)
+            clipped_start = max(slot_start, start)
+            clipped_end = min(slot_end, end)
 
-                if clipped_end <= clipped_start:
-                    continue
+            if clipped_end <= clipped_start:
+                continue
 
-                duration_hours = (
-                    clipped_end - clipped_start
-                ).total_seconds() / 3600
-                power_kw = prediction.value / 1000
-                slots.append(
-                    PredictionSlot(
-                        start=clipped_start,
-                        end=clipped_end,
-                        power_kw=power_kw,
-                        energy_kwh=power_kw * duration_hours
-                    )
+            duration_hours = (
+                clipped_end - clipped_start
+            ).total_seconds() / 3600
+            power_kw = prediction.value / 1000
+            slots.append(
+                PredictionSlot(
+                    start=clipped_start,
+                    end=clipped_end,
+                    power_kw=power_kw,
+                    energy_kwh=power_kw * duration_hours
                 )
+            )
 
         if not slots:
             raise ValueError('No forecast data found inside the requested window')
@@ -128,8 +150,21 @@ class RecommendationService:
 
     def _select_candidate(
         self,
-        candidates: list[UsageWindowCandidate]
+        candidates: list[UsageWindowCandidate],
+        request: UsageWindowRecommendationRequest,
     ) -> UsageWindowCandidate:
+        required_duration_hours = self._required_duration_hours(request)
+
+        if required_duration_hours > 0:
+            eligible = [
+                candidate
+                for candidate in candidates
+                if candidate.duration_hours >= required_duration_hours
+            ]
+
+            if eligible:
+                candidates = eligible
+
         return max(
             candidates,
             key=lambda candidate: (
@@ -148,12 +183,18 @@ class RecommendationService:
     ) -> UsageWindowRecommendationResult:
         energy_shortfall_kwh = self._energy_shortfall(
             candidate,
-            request.energy_requirement_kwh
+            self._energy_requirement_kwh(request)
         )
         surplus_kwh = max(
-            candidate.solar_energy_kwh - request.energy_requirement_kwh,
+            candidate.solar_energy_kwh - self._energy_requirement_kwh(request),
             0.0
         )
+        energy_requirement_kwh = self._energy_requirement_kwh(request)
+        confidence = min(
+            candidate.solar_energy_kwh / energy_requirement_kwh,
+            1.0
+        )
+        short_reason = self._build_short_reason(energy_shortfall_kwh)
 
         return UsageWindowRecommendationResult(
             installation_id=request.installation_id,
@@ -163,17 +204,87 @@ class RecommendationService:
             recommended_start=candidate.start,
             recommended_end=candidate.end,
             duration_hours=round(candidate.duration_hours, 2),
-            energy_requirement_kwh=round(request.energy_requirement_kwh, 3),
+            energy_requirement_kwh=round(energy_requirement_kwh, 3),
             expected_solar_energy_kwh=round(candidate.solar_energy_kwh, 3),
             expected_energy_shortfall_kwh=round(energy_shortfall_kwh, 3),
             expected_surplus_kwh=round(surplus_kwh, 3),
             expected_average_power_kw=round(candidate.average_power_kw, 3),
             coverage_ratio=round(
-                candidate.solar_energy_kwh / request.energy_requirement_kwh,
+                candidate.solar_energy_kwh / energy_requirement_kwh,
                 3
             ),
+            confidence=round(confidence, 3),
+            short_reason=short_reason,
+            recommended_time_window=(
+                f'{candidate.start.isoformat()} / {candidate.end.isoformat()}'
+            ),
+            expected_production_kwh=round(candidate.solar_energy_kwh, 3),
+            device_schedule=self._build_device_schedule(request, candidate),
             message=self._build_message(energy_shortfall_kwh)
         )
+
+    def _energy_requirement_kwh(
+        self,
+        request: UsageWindowRecommendationRequest
+    ) -> float:
+        if request.selected_devices:
+            return sum(
+                device.consumption_kwh
+                for device in request.selected_devices
+            )
+
+        if request.energy_requirement_kwh is None:
+            raise ValueError(
+                'energy_requirement_kwh or selected_devices is required'
+            )
+
+        return request.energy_requirement_kwh
+
+    def _build_device_schedule(
+        self,
+        request: UsageWindowRecommendationRequest,
+        candidate: UsageWindowCandidate
+    ) -> list[DeviceScheduleResult]:
+        devices = request.selected_devices
+
+        if not devices:
+            return []
+
+        schedule = []
+        current_start = candidate.start
+
+        for device in devices:
+            duration_minutes = max(int(device.duration_minutes or 60), 1)
+            start = current_start
+            end = start + timedelta(minutes=duration_minutes)
+            schedule.append(
+                DeviceScheduleResult(
+                    device=device.name,
+                    consumption_kwh=round(device.consumption_kwh, 3),
+                    start=start,
+                    end=end,
+                    reason=(
+                        'Scheduled inside the strongest expected solar '
+                        'production window.'
+                    )
+                )
+            )
+            current_start = end
+
+        return schedule
+
+    def _required_duration_hours(
+        self,
+        request: UsageWindowRecommendationRequest
+    ) -> float:
+        if not request.selected_devices:
+            return 0.0
+
+        total_minutes = sum(
+            max(int(device.duration_minutes or 60), 1)
+            for device in request.selected_devices
+        )
+        return total_minutes / 60
 
     def _energy_shortfall(
         self,
@@ -193,6 +304,12 @@ class RecommendationService:
             'The recommended window has the strongest expected solar production, '
             'but it does not fully cover the requested task energy.'
         )
+
+    def _build_short_reason(self, energy_shortfall_kwh: float) -> str:
+        if energy_shortfall_kwh == 0:
+            return 'Expected production covers the selected usage.'
+
+        return 'Best solar window, but some grid energy may still be needed.'
 
     def _to_local_naive(self, value: datetime) -> datetime:
         timezone = ZoneInfo(self.prediction_service.settings.timezone)

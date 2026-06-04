@@ -1,30 +1,136 @@
 {
   "app": {
-    "title": "Solar Panel Assistant"
+    "title": "SolarWise"
   },
   "navigation": {
-    "dashboard": "Dashboard",
-    "assistant": "Assistent",
-    "models": "Modellen",
-    "dataManagement": "Databeheer",
-    "settings": "Configuratie"
+    "dashboard": "Overzicht",
+    "forecasts": "Voorspelling",
+    "assistant": "Planner",
+    "analysis": "Productiehistoriek",
+    "datasets": "Data uploads",
+    "predictionModel": "AI-model",
+    "settings": "Instellingen",
+    "advanced": "Geavanceerd"
   },
   "profile": {
-    "name": "Thomas Peeters"
+    "name": "John Doe"
+  },
+  "countries": {
+    "BE": "België",
+    "NL": "Nederland",
+    "LU": "Luxemburg",
+    "DE": "Duitsland"
+  },
+  "common": {
+    "today": "Vandaag",
+    "tomorrow": "Morgen",
+    "dayAfterTomorrow": "Overmorgen",
+    "now": "Nu",
+    "windowPassed": "Beste venster is voorbij",
+    "cancel": "Annuleren",
+    "noProductionData": {
+      "title": "Nog geen productiegegevens beschikbaar",
+      "text": "Upload eerst productiegegevens om voorspellingen, analyses en planning te bekijken."
+    }
+  },
+  "weather": {
+    "labels": {
+      "clear": "Helder",
+      "sunny": "Zonnig",
+      "partlyCloudy": "Gedeeltelijk bewolkt",
+      "cloudy": "Bewolkt",
+      "rain": "Regen",
+      "lightRain": "Lichte regen",
+      "overcast": "Zwaar bewolkt"
+    }
+  },
+  "seasons": {
+    "winter": "Winter",
+    "spring": "Lente",
+    "summer": "Zomer",
+    "autumn": "Herfst"
+  },
+  "login": {
+    "eyebrow": "Welkom",
+    "title": "SolarWise",
+    "subtitle": "Maak je profiel aan om te starten.",
+    "owner": {
+      "stepLabel": "Stap 1 van 2",
+      "title": "Persoonlijk profiel",
+      "text": "Vul je naam in om verder te gaan.",
+      "subtitle": "Maak je profiel aan om te starten.",
+      "firstName": "Voornaam *",
+      "lastName": "Achternaam *",
+      "submit": "Volgende"
+    },
+    "installation": {
+      "stepLabel": "Stap 2 van 2",
+      "title": "Je installatie",
+      "text": "Vul je locatie in zodat SolarWise weer- en zonnegegevens kan gebruiken.",
+      "subtitle": "Vul je locatie in zodat SolarWise weer- en zonnegegevens kan gebruiken.",
+      "requiredLegend": "* Verplicht veld",
+      "name": "Naam installatie *",
+      "city": "Stad *",
+      "cityPlaceholder": "bijv. Brugge",
+      "country": "Land *",
+      "panelCount": "Aantal panelen",
+      "capacityKwp": "Installatievermogen (kWp)",
+      "optionalHelp": "Aantal panelen en installatievermogen zijn optioneel. Je kan deze later aanpassen via Instellingen.",
+      "submit": "Installatie aanmaken"
+    }
   },
   "dashboard": {
     "eyebrow": "Overzicht",
-    "title": "Dashboard Stad - Naam",
+    "title": "Overzicht",
+    "action": {
+      "eyebrow": "Aanbeveling",
+      "title": "Volgende beste productievenster",
+      "bestWindow": "Beste productievenster",
+      "expectedProduction": "Verwachte productie",
+      "expectedOutputNow": "Verwachte output nu",
+      "viewForecast": "Bekijk voorspelling",
+      "openPlanner": "Open planner",
+      "openRecommendations": "Bekijk aanbevelingen",
+      "suggestedAppliances": "Voorgestelde toestellen",
+      "suggestedAppliancesValue": "Wasmachine, boiler",
+      "appliances": {
+        "washingMachine": "Wasmachine",
+        "boiler": "Boiler"
+      }
+    },
+    "installation": {
+      "title": "Installatie",
+      "panelsUnit": "panelen",
+      "profileFallback": "Installatieprofiel",
+      "active": "Installatie actief"
+    },
+    "forecastStatus": {
+      "title": "Voorspellingsstatus"
+    },
+    "invalidForecast": {
+      "title": "Deze voorspelling lijkt niet geldig.",
+      "text": "Controleer de productie-eenheid van je dataset of train het model opnieuw.",
+      "ctaTitle": "Controleer je dataset",
+      "cta": "Dataset controleren",
+      "capacityLabel": "Installatievermogen"
+    },
+    "bottom": {
+      "title": "Planning",
+      "recommendationEyebrow": "Aanbeveling",
+      "recommendationTitle": "Aanbeveling",
+      "applianceEyebrow": "Planning",
+      "applianceTitle": "Toestelplanning"
+    },
     "weather": {
       "title": "Weer",
-      "temperature": "22°C",
+      "temperature": "22 °C",
       "cloudStatus": "Gedeeltelijk bewolkt",
       "tomorrow": "Morgen",
       "tomorrowCloudStatus": "Licht bewolkt",
       "min": "min",
       "max": "max",
       "tomorrowMin": "16",
-      "tomorrowMax": "25°C"
+      "tomorrowMax": "25 °C"
     },
     "info": {
       "title": "Info",
@@ -33,64 +139,269 @@
       "peakValue": "12:00 - 14:00",
       "yield": "Opbrengst vandaag",
       "yieldValue": "28.4 kWh",
-      "output": "Huidige output",
+      "output": "Verwachte output nu",
       "outputValue": "4.8 kW"
     },
     "prediction": {
       "eyebrow": "Voorspelling",
-      "meta": "Demodata · kW",
-      "chartTitle": "Demo zonne-output voorspelling voor drie dagen",
+      "meta": "kW",
+      "chartTitle": "Verwachte energieproductie",
+      "xAxis": "Datum / Tijd",
+      "yAxis": "Productie ({{unit}})",
+      "tooltipLabel": "Voorspelde productie:",
+      "forecast": "Voorspelling",
       "day1": "Dag 1",
       "day2": "Dag 2",
       "day3": "Dag 3"
+    },
+    "empty": {
+      "text": "Upload eerst productiegegevens om voorspellingen, analyses en planning te bekijken."
     }
   },
   "pages": {
+    "forecasts": {
+      "eyebrow": "Voorspelling",
+      "title": "Zonnevoorspelling",
+      "bestWindow": "Beste productievenster",
+      "weather": "Weer",
+      "weatherImpact": "Weersinvloed",
+      "weatherImpactValue": "Licht bewolkt",
+      "productionReduction": "Geschatte productiedaling: 8%",
+      "tomorrow": "Morgen",
+      "empty": {
+        "text": "Upload eerst productiegegevens om voorspellingen, analyses en planning te bekijken."
+      }
+    },
+    "analysis": {
+      "eyebrow": "Productiehistoriek",
+      "title": "Productiehistoriek",
+      "heading": "Hoe presteert je installatie?",
+      "text": "Begrijp historische productiepatronen op basis van je geuploade datasets.",
+      "monthlyChart": "Gemiddelde maandopbrengst",
+      "monthlyChartSubtitle": "Gemiddelde opbrengst per maand op basis van je geüploade gegevens.",
+      "seasonalChart": "Gemiddelde seizoensopbrengst",
+      "seasonalChartSubtitle": "Gemiddelde opbrengst per seizoen op basis van je geüploade gegevens.",
+      "productionAxis": "Productie ({{unit}})",
+      "averageProductionAxis": "Gemiddelde opbrengst ({{unit}})",
+      "monthAxis": "Maand",
+      "seasonAxis": "Seizoen",
+      "selectorLabel": "Periode",
+      "range": {
+        "all": "Alle maanden",
+        "recent": "Laatste maanden"
+      },
+      "aiInsights": "Productie-inzichten",
+      "aiText": "Historische patronen op basis van geuploade productiegegevens.",
+      "bestProductionWindow": "Beste productievenster",
+      "bestProductionMonth": "Beste productiemaand",
+      "bestMonthValue": "Mei",
+      "peakProductionHour": "Piekproductie-uur",
+      "strongestSeason": "Sterkste seizoen",
+      "strongestSeasonValue": "Zomer",
+      "summerWinterDifference": "Zomer vs winter",
+      "loading": "Productiehistoriek laden...",
+      "empty": {
+        "title": "Nog geen productiehistoriek",
+        "text": "Upload eerst productiegegevens om analyses te bekijken."
+      },
+      "detailsTitle": "Details",
+      "details": {
+        "datasetBasis": "Basis",
+        "datasetBasisValue": "Geuploade productiedataset",
+        "timeWindow": "Periode",
+        "trendType": "Type",
+        "trendTypeValue": "Productietrends"
+      }
+    },
     "models": {
-      "eyebrow": "Modellen",
-      "title": "Modellen",
-      "text": "Kies welk model gebruikt wordt voor voorspellingen.",
-      "listLabel": "Modellenlijst",
-      "listTitle": "Beschikbare modellen",
-      "r2": "Accuracy",
-      "mse": "Offset (kW)",
+      "eyebrow": "Geavanceerd",
+      "title": "AI-model",
+      "text": "Bekijk welk model gebruikt wordt voor je voorspellingen.",
+      "empty": {
+        "text": "Upload eerst productiegegevens om voorspellingen, analyses en planning te bekijken."
+      },
+      "listLabel": "AI-model overzicht",
+      "listTitle": "Beschikbare AI-modellen",
+      "activeTitle": "Actief AI-model",
+      "comparisonTitle": "Modelvergelijking",
+      "comparisonText": "Vergelijk de beschikbare modellen zonder technische details op de voorgrond te zetten.",
+      "r2": "Voorspellingsnauwkeurigheid",
+      "accuracyColumn": "Nauwkeurigheid",
+      "r2Score": "R²-score",
+      "mse": "Gemiddelde voorspelfout",
       "dataset": "Dataset",
+      "datasetFriendly": "Productiedataset",
+      "notAvailable": "Nog niet beschikbaar",
+      "hiddenDataset": "Geavanceerde details",
       "trainedOn": "Getraind op",
-      "enabled": "Ingeschakeld",
-      "disabled": "Uitgeschakeld",
-      "activateModel": "{{model}} inschakelen"
+      "enabled": "Actief",
+      "disabled": "Gebruik model",
+      "activateModel": "{{model}} inschakelen",
+      "compareModels": "Vergelijk modellen",
+      "accuracyHelpTitle": "Voorspellingsnauwkeurigheid",
+      "accuracyHelp": "Hoe dichter bij 1, hoe beter.",
+      "errorHelpTitle": "Gemiddelde voorspelfout",
+      "errorHelp": "Gemiddelde afwijking tussen voorspelling en werkelijke productie.",
+      "table": {
+        "model": "Model",
+        "status": "Status"
+      },
+      "advanced": {
+        "title": "Geavanceerde details",
+        "trainingDate": "Trainingsdatum",
+        "metadata": "Modelmetadata",
+        "version": "Versie-informatie"
+      }
     },
     "dataManagement": {
-      "eyebrow": "Data",
-      "title": "Databeheer",
-      "text": "Hier vind je de datasets die je hebt toegevoegd.",
+      "eyebrow": "Datasets",
+      "title": "Datasets",
+      "text": "Beheer de CSV-bestanden die gebruikt worden om aanbevelingen en voorspellingen te maken.",
+      "loading": "Datasets laden...",
       "listLabel": "Datasetlijst",
-      "listTitle": "Beschikbare datasets",
+      "listTitle": "Jouw datasets",
       "location": "Locatie",
-      "resolution": "Resolutie",
       "rows": "Rijen",
-      "dateRange": "Periode"
-    },
-    "assistant": {
-      "eyebrow": "Assistent",
-      "title": "Energieassistent",
-      "heading": "Energieassistent",
-      "text": "Kies welke toestellen je wilt gebruiken en krijg een aanbevolen tijdsvenster.",
-      "devices": {
-        "eyebrow": "Toestellen",
-        "title": "Welke toestellen wil je gebruiken?",
-        "result": {
-          "timeWindow": "12:00 - 15:00",
-          "production": "5.8 kW",
-          "confidence": "Hoog",
-          "reason": "Deze combinatie past goed binnen de verwachte zonnepiek van vandaag.",
-          "empty": "Selecteer minstens één toestel om een aanbeveling te krijgen."
+      "dateRange": "Periode",
+      "retrain": "Model opnieuw trainen",
+      "retraining": "Training starten...",
+      "retrainFailed": "We konden de training niet starten.",
+      "table": {
+        "dataset": "Dataset",
+        "status": "Status",
+        "action": "Actie"
+      },
+      "advanced": {
+        "title": "Geavanceerde details",
+        "originalFile": "Originele bestandsnaam",
+        "originalColumns": "Originele kolommen",
+        "dateColumn": "Gekozen datumkolom",
+        "measurementColumn": "Gekozen productiekolom",
+        "unit": "Productie-eenheid",
+        "internalColumns": "Gestandaardiseerde kolommen",
+        "storage": "Interne opslag",
+        "hash": "Dataset-hash",
+        "uploaded": "Geupload",
+        "columns": "Gevonden kolommen"
+      },
+      "empty": {
+        "title": "Nog geen datasets",
+        "text": "Upload een CSV-bestand om voorspellingen, aanbevelingen en prestaties mogelijk te maken.",
+        "benefits": {
+          "forecasts": "Voorspellingen maken",
+          "recommendations": "Toestellen plannen",
+          "analysis": "Productiehistoriek bekijken"
         }
       },
+      "upload": {
+        "button": "Productiegegevens uploaden",
+        "title": "Productiegegevens uploaden",
+        "dropTitle": "Sleep je CSV hierheen",
+        "browse": "of klik om te bladeren",
+        "format": "Ondersteund formaat: CSV met datum, tijd en productie.",
+        "invalidType": "Gebruik een CSV-bestand.",
+        "invalid": "We konden dit bestand niet valideren.",
+        "valid": "Dataset geaccepteerd.",
+        "validWithColumns": "Kolommen herkend: {{date}} en {{measurement}}.",
+        "missingProduction": "Productiekolom ontbreekt.",
+        "mappingMissing": "We konden de datum- of productiekolom niet automatisch herkennen.",
+        "uploading": "Dataset uploaden...",
+        "uploadingShort": "Uploaden...",
+        "success": "Dataset is toegevoegd.",
+        "uploadedSuccessfully": "Dataset succesvol geüpload.",
+        "alreadyUploaded": "Deze dataset werd al geüpload.",
+        "failed": "Upload mislukt.",
+        "confirm": "Dataset toevoegen",
+        "productionUnitHelp": "Is je productie gemeten in W, kW, Wh of kWh?",
+        "columns": "Gevonden kolommen",
+        "stateWarning": "Dataset bestaat al",
+        "duplicateTitle": "Deze dataset bestaat al",
+        "duplicateText": "SolarWise herkent dit bestand als een dataset die eerder werd toegevoegd.",
+        "existingDataset": "Bestaande dataset:",
+        "useExisting": "Bestaande dataset gebruiken",
+        "chooseDifferent": "Ander bestand kiezen"
+      }
+    },
+    "assistant": {
+      "eyebrow": "Planner",
+      "title": "Slimme planner",
+      "heading": "Slimme planner",
+      "text": "Kies je toestellen en laat SolarWise het beste moment voorstellen.",
+      "intentLabel": "Assistent keuzes",
+      "guided": {
+        "eyebrow": "Suggestie"
+      },
+      "intents": {
+        "useSolar": {
+          "title": "Meer zonne-energie gebruiken",
+          "text": "Vind het beste moment op basis van verwachte zonneproductie.",
+          "recommendation": "Plan grote toestellen tussen 12:00 en 15:00. Dan is de verwachte zonneproductie het sterkst."
+        },
+        "reduceCosts": {
+          "title": "Kosten verlagen",
+          "text": "Vermijd dure of ongunstige momenten.",
+          "recommendation": "Verschuif flexibele toestellen naar de zonnigste uren en vermijd zware toestellen in de avond."
+        },
+        "scheduleAppliances": {
+          "title": "Toestellen plannen",
+          "text": "Kies toestellen en krijg een planning.",
+          "recommendation": "Selecteer toestellen om een concrete planning te maken."
+        },
+        "prepareTomorrow": {
+          "title": "Morgen voorbereiden",
+          "text": "Bekijk wat je best bewaart voor morgen.",
+          "recommendation": "Als een toestel niet dringend is, bewaar het voor het sterkste zonnevenster van morgen."
+        },
+        "analyzeProduction": {
+          "title": "Productiehistoriek bekijken",
+          "text": "Bekijk patronen uit je geuploade datasets.",
+          "recommendation": "Bekijk historische productiepatronen om veranderingen in piekoutput sneller te herkennen."
+        }
+      },
+      "devices": {
+        "eyebrow": "Toestellen",
+        "title": "Stap 1 - Kies toestellen",
+        "usage": "kWh",
+        "duration": "Duur (min)",
+        "customName": "Eigen toestel",
+        "addCustom": "Toevoegen",
+        "edit": "Bewerken",
+        "save": "Klaar",
+        "result": {
+          "timeWindow": "12:00 - 15:00",
+          "production": "5.8 kWh",
+          "productionContext": "Goed moment",
+          "reason": "Deze combinatie past goed binnen de verwachte zonnepiek van vandaag.",
+          "empty": "Selecteer minstens een toestel om een planning te maken."
+        }
+      },
+      "summary": {
+        "selected": "{{count}} geselecteerde toestellen",
+        "usage": "{{value}} kWh totaal verbruik",
+        "duration": "{{value}} totale duur"
+      },
+      "modal": {
+        "name": "Naam",
+        "usage": "Geschat verbruik",
+        "duration": "Duur",
+        "save": "Opslaan",
+        "add": "Toevoegen"
+      },
+      "empty": {
+        "text": "Upload eerst productiegegevens om voorspellingen, analyses en planning te bekijken."
+      },
+      "timeAwareness": {
+        "todayPassed": "Het beste venster voor vandaag is voorbij. SolarWise stelt morgen voor."
+      },
       "form": {
+        "title": "Stap 2 - Wanneer wil je plannen?",
         "preferredDate": "Voorkeursdatum",
         "timeWindow": "Voorkeurstijd",
         "timeOptions": {
+          "auto": "Laat SolarWise kiezen",
+          "today": "Vandaag",
+          "tomorrow": "Morgen",
+          "dayAfterTomorrow": "Overmorgen",
           "morning": "Ochtend",
           "daytime": "Overdag",
           "afternoon": "Namiddag",
@@ -100,20 +411,41 @@
       "appliances": {
         "washingMachine": "Wasmachine",
         "dishwasher": "Vaatwasser",
-        "dryer": "Droogkast",
-        "boiler": "Boiler"
+        "dryer": "Droger",
+        "boiler": "Boiler",
+        "oven": "Oven",
+        "evCharging": "Elektrische wagen laden",
+        "laptopCharging": "Laptop opladen"
       },
       "result": {
         "eyebrow": "Aanbeveling",
-        "title": "Resultaat",
+        "title": "Stap 3 - Maak planning",
         "timeWindow": "Aanbevolen tijd",
         "expectedProduction": "Verwachte productie",
-        "confidence": "Zekerheid"
+        "productionContext": "Productiecontext",
+        "productionContextValue": "Past bij de verwachte zonnepiek"
       },
       "schedule": {
-        "eyebrow": "Planning",
+        "eyebrow": "Resultaat",
         "title": "Aanbevolen planning",
-        "empty": "Selecteer toestellen om een planning te zien.",
+        "selectedLabel": "Aanbevolen planning",
+        "alternativesLabel": "Agenda-overzicht",
+        "alternativesTitle": "Andere geschikte momenten",
+        "bestPlanTitle": "Beste planning",
+        "empty": "Nog geen planning. Selecteer toestellen en klik op Planning maken.",
+        "bestWindow": "Beste venster",
+        "recommendedTitle": "Aanbevolen planning",
+        "durationLabel": "Duur",
+        "expectedProductionWindow": "Verwachte productie tijdens dit venster",
+        "averageProductionLabel": "Gemiddelde productie",
+        "selectedBadge": "Gekozen",
+        "noSuitableMoment": "Geen geschikt moment meer",
+        "notSelectedDay": "Geen planning voor deze dag",
+        "planner": {
+          "title": "Planning",
+          "empty": "Nog geen geschikt tijdsvenster gevonden.",
+          "passed": "Beste venster is voorbij"
+        },
         "washingMachine": {
           "time": "10:30 - 12:00",
           "note": "Start vroeg genoeg zodat de cyclus klaar is tijdens de zonnepiek."
@@ -128,77 +460,20 @@
         },
         "boiler": {
           "time": "11:00 - 15:00",
-          "note": "Laat de boiler geleidelijk opwarmen tijdens de zonnige uren."
-        }
+          "note": "Laat de boiler geleidelijk opwarmen tijdens zonnige uren."
+        },
+        "expectedProduction": "Verwachte productie"
       },
-      "tabs": {
-        "label": "Adviescategorieën",
-        "car": "Auto laden",
-        "washingMachine": "Wasmachine",
-        "dishwasher": "Vaatwasser",
-        "dryer": "Droogkast",
-        "boiler": "Boiler"
-      },
-      "advice": {
-        "car": {
-          "eyebrow": "Auto",
-          "title": "Wanneer laad ik mijn auto?",
-          "summary": "Laad vooral rond de middag, wanneer de voorspelde zonneproductie het hoogst is.",
-          "items": [
-            { "label": "Beste moment", "value": "12:00 - 15:00" },
-            { "label": "Reden", "value": "Hoogste zonneproductie" },
-            { "label": "Advies", "value": "Start met laden na 12:00" }
-          ]
-        },
-        "washingMachine": {
-          "eyebrow": "Wasmachine",
-          "title": "Wanneer zet ik de wasmachine aan?",
-          "summary": "Plan de wasmachine in het late voormiddagblok zodat het programma klaar is tijdens de piek.",
-          "items": [
-            { "label": "Beste moment", "value": "10:30 - 13:00" },
-            { "label": "Reden", "value": "Stijgende opbrengst" },
-            { "label": "Advies", "value": "Gebruik een uitgestelde start" }
-          ]
-        },
-        "dishwasher": {
-          "eyebrow": "Vaatwasser",
-          "title": "Wanneer zet ik de vaatwasser aan?",
-          "summary": "Laat de vaatwasser draaien rond de middag of vroege namiddag, wanneer er voldoende zonneproductie is.",
-          "items": [
-            { "label": "Beste moment", "value": "12:00 - 14:30" },
-            { "label": "Reden", "value": "Goede productie tijdens korte cyclus" },
-            { "label": "Advies", "value": "Gebruik eco of uitgestelde start" }
-          ]
-        },
-        "dryer": {
-          "eyebrow": "Droogkast",
-          "title": "Wanneer gebruik ik de droogkast?",
-          "summary": "Gebruik de droogkast bij voorkeur net na de middagpiek, zolang er nog voldoende productie is.",
-          "items": [
-            { "label": "Beste moment", "value": "13:00 - 16:00" },
-            { "label": "Reden", "value": "Sterke namiddagproductie" },
-            { "label": "Advies", "value": "Vermijd de avonduren" }
-          ]
-        },
-        "boiler": {
-          "eyebrow": "Boiler",
-          "title": "Wanneer verwarm ik de boiler?",
-          "summary": "Laat de boiler overdag opwarmen, zodat hij minder netstroom nodig heeft in de avond.",
-          "items": [
-            { "label": "Beste moment", "value": "11:00 - 15:00" },
-            { "label": "Reden", "value": "Constante zonneproductie" },
-            { "label": "Advies", "value": "Plan opwarming rond de middag" }
-          ]
-        }
-      }
+      "getRecommendation": "Planning maken",
+      "loadingRecommendation": "Planning maken..."
     }
   },
   "settings": {
-    "eyebrow": "Configuratie",
-    "title": "Configuratie",
+    "eyebrow": "Instellingen",
+    "title": "Instellingen",
     "preferencesLabel": "Voorkeuren",
     "tabs": {
-      "label": "Configuratietabs",
+      "label": "Settings tabs",
       "installation": "Installatie",
       "consumption": "Verbruik",
       "preferences": "Voorkeuren"
@@ -206,14 +481,55 @@
     "installation": {
       "title": "Installatie",
       "text": "Vul de basisgegevens van de zonnepaneleninstallatie in.",
+      "name": "Naam installatie",
+      "namePlaceholder": "Thuisinstallatie",
       "powerTitle": "Vermogen",
       "powerText": "Geef het totale piekvermogen van de installatie op.",
       "panelCount": "Aantal panelen",
-      "installationKwp": "Installatievermogen (kWp)"
+      "installationKwp": "Installatievermogen (kWp)",
+        "panelPlaceholder": "bijv. 12",
+        "powerPlaceholder": "bijv. 4.8",
+        "optionalTitle": "Optionele gegevens",
+      "locationTitle": "Locatie",
+      "locationText": "Wordt gebruikt voor aanbevelingen met weersinformatie.",
+      "location": "Locatie",
+      "city": "Stad",
+      "cityPlaceholder": "bijv. Brugge",
+      "country": "Land"
     },
     "consumption": {
       "title": "Verbruik",
+      "tableTitle": "Mijn toestellen",
+      "tableText": "Beheer je toestellen en pas hun verbruik alleen aan wanneer nodig.",
+      "addDevice": "Toestel toevoegen",
+      "edit": "Bewerken",
+      "editTitle": "Toestel bewerken",
+      "editText": "Pas naam, categorie, verbruik en status aan.",
+      "columns": {
+        "device": "Toestel",
+        "category": "Categorie",
+        "usage": "Verbruik",
+        "duration": "Duur",
+        "status": "Status",
+        "actions": "Acties"
+      },
+      "categories": {
+        "laundry": "Was",
+        "kitchen": "Keuken",
+        "heating": "Warm water",
+        "mobility": "Mobiliteit",
+        "electronics": "Elektronica",
+        "other": "Overig"
+      },
       "kwh": "Verbruik (kWh)",
+      "duration": "Duur (min)",
+      "enabled": "Geselecteerd",
+      "disabled": "Niet geselecteerd",
+      "customTitle": "Eigen activiteit",
+      "customText": "Voeg een activiteit toe die niet in de standaardvoorstellen staat.",
+      "customName": "Naam activiteit",
+      "addCustom": "Activiteit toevoegen",
+      "remove": "Verwijderen",
       "car": {
         "title": "Auto laden",
         "text": "Gemiddeld verbruik per laadsessie."
@@ -250,18 +566,98 @@
         "description": "Nederlands"
       },
       "fr": {
-        "label": "Français",
+        "label": "Francais",
         "description": "Frans"
       },
       "en": {
         "label": "English",
         "description": "Engels"
       }
+    },
+    "preferences": {
+      "strategyTitle": "Aanbevelingsstrategie",
+      "strategyText": "Kies hoe de assistent suggesties moet prioriteren.",
+      "recommendationStrategy": "Strategie",
+      "preferredUsage": "Voorkeur voor toestelgebruik",
+      "strategyOptions": {
+        "solar": "Meer zonne-energie gebruiken",
+        "cost": "Kosten verlagen",
+        "balanced": "Gebalanceerd"
+      },
+      "usageOptions": {
+        "morning": "Ochtend",
+        "afternoon": "Namiddag",
+        "evening": "Avond",
+        "flexible": "Flexibel"
+      }
+    },
+    "saveChanges": "Wijzigingen opslaan",
+    "saving": "Opslaan...",
+    "saved": "Wijzigingen opgeslagen",
+    "unsaved": "Instellingen worden automatisch bewaard",
+    "developer": {
+      "title": "Developer mode",
+      "text": "Gebruik lokale beheeracties voor testen en resetten.",
+      "enabled": "Developer mode actief",
+      "disabled": "Developer mode uit",
+      "warning": "Deze acties verwijderen lokale gegevens en zijn alleen bedoeld voor development.",
+      "working": "Bezig...",
+      "deleteOwner": "Owner verwijderen",
+      "resetDatabase": "Lokale database resetten"
     }
   },
-  "demo": {
+  "training": {
+    "eyebrow": "Analyse",
+    "title": "SolarWise analyseert je productiegegevens",
+    "subtitle": "We bouwen een voorspelling op basis van jouw installatie.",
+    "currentPhase": "{{phase}}",
+    "progress": "Voortgang",
+    "technicalDetails": "Technische details",
+    "trialLabel": "Optuna",
+    "trialValue": "Trial {{current}} van {{total}}",
+    "bestRmse": "Beste RMSE",
+    "pollingError": "Status ophalen",
+    "phases": {
+      "queued": "Wachten op verwerking",
+      "validating_dataset": "Productiegegevens controleren",
+      "preparing_features": "Kenmerken voorbereiden",
+      "optimizing": "Model optimaliseren",
+      "training_final_model": "Eindmodel trainen",
+      "evaluating": "Model evalueren",
+      "saving_model": "Model opslaan",
+      "completed": "Klaar",
+      "failed": "Mislukt"
+    },
+    "completed": {
+      "title": "Je voorspelling is klaar",
+      "text": "SolarWise heeft je productiegegevens geanalyseerd. Je kan nu toestellen plannen op basis van je verwachte productie.",
+      "openPlanner": "Open planner",
+      "overview": "Naar overzicht"
+    },
+    "failed": {
+      "title": "We konden je productiegegevens niet verwerken.",
+      "text": "Controleer je CSV-bestand en probeer opnieuw.",
+      "retry": "Opnieuw uploaden",
+      "backToUploads": "Terug naar data uploads"
+    },
+    "guard": {
+      "title": "SolarWise verwerkt je productiegegevens",
+      "text": "Voorspellingen en planning zijn beschikbaar zodra de analyse klaar is.",
+      "button": "Bekijk voortgang"
+    },
+    "errorCodes": {
+      "missing_columns": "Er ontbreken verplichte kolommen in het CSV-bestand.",
+      "invalid_format": "Het CSV-bestand heeft niet het verwachte formaat.",
+      "training_failed": "De modeltraining is mislukt.",
+      "dataset_validation_failed": "De productiegegevens konden niet gevalideerd worden."
+    }
+  },
+  "datasetMeta": {
     "status": {
-      "ready": "Klaar"
+      "ready": "Klaar",
+      "processing": "Bezig",
+      "error": "Error",
+      "used": "Gebruikt voor planning"
     },
     "resolution": {
       "hourly": "Per uur",

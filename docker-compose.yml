@@ -1,28 +1,36 @@
 services:
   api:
     build:
-      context: .
+      context: ./api
       dockerfile: Dockerfile
     ports:
       - "8000:8000"
     depends_on:
-      postgres:
-        condition: service_healthy
       redis:
         condition: service_started
     environment:
-      POSTGRES_HOST: postgres
-      POSTGRES_PORT: ${POSTGRES_PORT:-5432}
-      POSTGRES_USER: ${POSTGRES_USER:-postgres}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
-      POSTGRES_DB: ${POSTGRES_DB:-solar_energy_assistant}
       REDIS_HOST: redis
       REDIS_PORT: ${REDIS_PORT:-6379}
+      SQLITE_DB_PATH: ${SQLITE_DB_PATH:-storage/app.db}
       MODEL_STORAGE_DIR: ${MODEL_STORAGE_DIR:-model_artifacts}
       UPLOAD_STORAGE_DIR: ${UPLOAD_STORAGE_DIR:-storage/uploads}
     volumes:
       - ./api/${MODEL_STORAGE_DIR:-model_artifacts}:/app/${MODEL_STORAGE_DIR:-model_artifacts}
+      - ./api/storage:/app/storage
       - ./api/${UPLOAD_STORAGE_DIR:-storage/uploads}:/app/${UPLOAD_STORAGE_DIR:-storage/uploads}
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - "5173:5173"
+    environment:
+      VITE_API_BASE_URL: http://localhost:8000
+      CHOKIDAR_USEPOLLING: "true"
+    depends_on:
+      - api
     restart: unless-stopped
 
   redis:
@@ -30,30 +38,3 @@ services:
     ports:
       - "6379:6379"
     restart: unless-stopped
-
-  postgres:
-    image: postgres:18-alpine
-    shm_size: 128mb
-    environment:
-      POSTGRES_USER: ${POSTGRES_USER:-postgres}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
-      POSTGRES_DB: ${POSTGRES_DB:-solar_energy_assistant}
-    ports:
-      - "${POSTGRES_PORT:-5432}:5432"
-    volumes:
-      - postgres_data:/var/lib/postgresql
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres} -d ${POSTGRES_DB:-solar_energy_assistant}"]
-      interval: 5s
-      timeout: 5s
-      retries: 10
-    restart: unless-stopped
-
-  adminer:
-    image: adminer
-    restart: always
-    ports:
-      - "${ADMINER_PORT:-8080}:8080"
-
-volumes:
-  postgres_data:

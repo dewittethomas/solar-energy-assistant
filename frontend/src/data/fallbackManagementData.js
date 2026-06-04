@@ -1,0 +1,65 @@
+export const datasets = [
+  {
+    id: 'dataset-001',
+    location: 'Brussel',
+    resolutionKey: 'datasetMeta.resolution.hourly',
+    rows: '8,760',
+    dateRange: 'Jan 2024 - Dec 2024',
+    status: 'used',
+    statusKey: 'datasetMeta.status.used',
+  },
+  {
+    id: 'dataset-002',
+    location: 'Gent',
+    resolutionKey: 'datasetMeta.resolution.fifteenMinutes',
+    rows: '35,040',
+    dateRange: 'Jan 2025 - Dec 2025',
+    status: 'processing',
+    statusKey: 'datasetMeta.status.processing',
+  },
+  {
+    id: 'dataset-003',
+    location: 'Antwerpen',
+    resolutionKey: 'datasetMeta.resolution.hourly',
+    rows: '4,320',
+    dateRange: 'Jan 2026 - Jun 2026',
+    statusKey: 'datasetMeta.status.ready',
+    status: 'ready',
+  },
+  {
+    id: 'dataset-004',
+    location: 'Leuven',
+    resolutionKey: 'datasetMeta.resolution.hourly',
+    rows: '0',
+    dateRange: '-',
+    statusKey: 'datasetMeta.status.error',
+    status: 'error',
+  },
+]
+
+export const models = [
+  {
+    id: 'model-001',
+    name: 'SolarWise model 001',
+    dataset: 'dataset-001',
+    trainedOn: 'May 12, 2026',
+    r2: '0.91',
+    mse: '0.18 kW',
+  },
+  {
+    id: 'model-002',
+    name: 'SolarWise model 002',
+    dataset: 'dataset-002',
+    trainedOn: 'May 8, 2026',
+    r2: '0.86',
+    mse: '0.27 kW',
+  },
+  {
+    id: 'model-003',
+    name: 'SolarWise model 003',
+    dataset: 'dataset-003',
+    trainedOn: 'Apr 30, 2026',
+    r2: '0.74',
+    mse: '0.46 kW',
+  },
+]

@@ -28,3 +28,6 @@ class ModelRepository:
 
     def list_metrics(self, model_id: str) -> list[dict[str, object]]:
         return self.metadata_repository.list_model_metrics(model_id)
+
+    def activate(self, model_id: str) -> dict[str, object] | None:
+        return self.metadata_repository.activate_model(model_id)

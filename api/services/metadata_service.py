@@ -18,7 +18,14 @@ class MetadataService:
         installation_id: str,
         path: Path,
         granularity: str,
-        value_column: str
+        value_column: str,
+        production_unit: str | None = None,
+        source_name: str | None = None,
+        original_columns: list[str] | None = None,
+        internal_columns: list[str] | None = None,
+        date_column: str | None = None,
+        time_column: str | None = None,
+        measurement_column: str | None = None,
     ) -> dict[str, object]:
         return self.repository.save_dataset(
             installation_id=installation_id,
@@ -26,7 +33,14 @@ class MetadataService:
             path=self._format_path(path),
             row_count=len(df),
             granularity=granularity,
-            value_column=value_column
+            value_column=value_column,
+            production_unit=production_unit,
+            source_name=source_name,
+            original_columns=original_columns,
+            internal_columns=internal_columns,
+            date_column=date_column,
+            time_column=time_column,
+            measurement_column=measurement_column,
         )
 
     def register_parquet_dataset(self, path: Path) -> dict[str, object]:
@@ -40,15 +54,41 @@ class MetadataService:
             installation_id=self._get_installation_id(df),
             path=path,
             granularity=self._detect_granularity(df),
-            value_column=self._get_value_column(df)
+            value_column=self._get_value_column(df),
+            production_unit='kW'
         )
+
+    def inspect_parquet_dataset(self, path: Path) -> dict[str, object]:
+        if not path.exists():
+            raise ValueError(f'Parquet file does not exist: {path}')
+
+        df = pd.read_parquet(path)
+        timestamps = pd.to_datetime(df.get('timestamp'), errors='coerce')
+        timestamps = timestamps.dropna().sort_values()
+
+        return {
+            'installation_id': self._get_installation_id(df),
+            'dataset_hash': self.calculate_dataset_hash(df),
+            'records': len(df),
+            'period_start': (
+                timestamps.iloc[0].date().isoformat()
+                if len(timestamps) > 0
+                else None
+            ),
+            'period_end': (
+                timestamps.iloc[-1].date().isoformat()
+                if len(timestamps) > 0
+                else None
+            ),
+        }
 
     def list_datasets(
         self,
         limit: int = 100,
-        offset: int = 0
+        offset: int = 0,
+        installation_id: str | None = None
     ) -> list[dict[str, object]]:
-        return self.repository.list_datasets(limit, offset)
+        return self.repository.list_datasets(limit, offset, installation_id)
 
     def get_dataset(self, dataset_id: str) -> dict[str, object] | None:
         return self.repository.get_dataset(dataset_id)
@@ -59,6 +99,40 @@ class MetadataService:
         notes: str | None = None
     ) -> dict[str, object]:
         return self.repository.start_training_run(dataset_id, notes)
+
+    def create_training_run(
+        self,
+        installation_id: str,
+        dataset_id: str | None = None,
+        status: str = 'queued',
+        phase: str = 'queued',
+        progress: int = 0
+    ) -> dict[str, object]:
+        return self.repository.create_training_run(
+            installation_id=installation_id,
+            dataset_id=dataset_id,
+            status=status,
+            phase=phase,
+            progress=progress,
+        )
+
+    def update_training_run(
+        self,
+        run_id: str,
+        **changes: object
+    ) -> None:
+        self.repository.update_training_run(run_id, **changes)
+
+    def get_training_run(self, run_id: str) -> dict[str, object] | None:
+        return self.repository.get_training_run(run_id)
+
+    def get_latest_incomplete_training_run(
+        self,
+        installation_id: str
+    ) -> dict[str, object] | None:
+        return self.repository.get_latest_incomplete_training_run(
+            installation_id
+        )
 
     def finish_training_run(
         self,
@@ -153,21 +227,18 @@ class MetadataService:
     def _get_value_column(self, df: pd.DataFrame) -> str:
         value_columns = [
             column
-            for column in ('power_kw', 'energy_kwh')
+            for column in ('power_kw',)
             if column in df.columns
         ]
 
         if len(value_columns) != 1:
             raise ValueError(
-                'Expected exactly one value column: power_kw or energy_kwh'
+                'Expected exactly one value column: power_kw'
             )
 
         return value_columns[0]
 
     def _detect_granularity(self, df: pd.DataFrame) -> str:
-        if 'energy_kwh' in df.columns:
-            return 'monthly'
-
         if 'timestamp' not in df.columns:
             return 'unknown'
 
@@ -181,9 +252,6 @@ class MetadataService:
             return 'unknown'
 
         interval_minutes = timestamps.diff().dropna().median().total_seconds() / 60
-
-        if interval_minutes >= 28 * 24 * 60:
-            return 'monthly'
 
         if interval_minutes >= 60:
             return 'hourly'

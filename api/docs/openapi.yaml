@@ -1,0 +1,1197 @@
+openapi: 3.1.0
+info:
+  title: Solar Energy Assistant API
+  version: 1.0.0
+  description: Local single-owner API for owner onboarding, installations, datasets, training, predictions, dashboard, and recommendations.
+servers:
+  - url: http://localhost:8000
+tags:
+  - name: owner
+  - name: installations
+  - name: datasets
+  - name: models
+  - name: predictions
+  - name: recommendations
+paths:
+  /owner:
+    get:
+      tags: [owner]
+      operationId: get_owner
+      responses:
+        '200':
+          description: Current local owner
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OwnerResult'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    post:
+      tags: [owner]
+      operationId: create_owner
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OwnerPayload'
+      responses:
+        '200':
+          description: Owner created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OwnerResult'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '409':
+          description: Local owner already exists
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    put:
+      tags: [owner]
+      operationId: update_owner
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OwnerPayload'
+      responses:
+        '200':
+          description: Owner updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OwnerResult'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /installations:
+      post:
+      tags: [installations]
+      operationId: create_installation
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/InstallationCreate'
+        responses:
+          '200':
+            description: Installation created
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/InstallationConfigurationResult'
+          '400':
+            $ref: '#/components/responses/BadRequest'
+          '404':
+            $ref: '#/components/responses/NotFound'
+
+  /developer/reset-local-state:
+    post:
+      tags: [developer]
+      operationId: reset_local_state
+      responses:
+        '200':
+          description: Local state reset
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+
+  /developer/owner:
+    delete:
+      tags: [developer]
+      operationId: delete_local_owner
+      responses:
+        '200':
+          description: Local owner deleted
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+
+  /installations/active:
+    get:
+      tags: [installations]
+      operationId: get_active_installation
+      responses:
+        '200':
+          description: Active installation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InstallationConfigurationResult'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /installations/consuming-activities/defaults:
+    get:
+      tags: [installations]
+      operationId: list_default_consuming_activities
+      responses:
+        '200':
+          description: Default consuming activities
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ConsumingActivity'
+
+  /installations/{installation_id}/configuration:
+    get:
+      tags: [installations]
+      operationId: get_installation_configuration
+      parameters:
+        - $ref: '#/components/parameters/InstallationId'
+      responses:
+        '200':
+          description: Installation configuration
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InstallationConfigurationResult'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    put:
+      tags: [installations]
+      operationId: save_installation_configuration
+      parameters:
+        - $ref: '#/components/parameters/InstallationId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/InstallationConfigurationUpdate'
+      responses:
+        '200':
+          description: Installation configuration updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InstallationConfigurationResult'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /installations/{installation_id}/dashboard:
+    get:
+      tags: [installations]
+      operationId: get_installation_dashboard
+      parameters:
+        - $ref: '#/components/parameters/InstallationId'
+      responses:
+        '200':
+          description: Dashboard summary
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DashboardResult'
+
+  /installations/{installation_id}/predictions:
+    get:
+      tags: [installations]
+      operationId: predict_installation_solar_yield
+      parameters:
+        - $ref: '#/components/parameters/InstallationId'
+        - $ref: '#/components/parameters/StartDate'
+        - $ref: '#/components/parameters/EndDate'
+      responses:
+        '200':
+          description: Prediction result or not-ready state
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/PredictionResult'
+                  - $ref: '#/components/schemas/PredictionNotReadyResult'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /datasets:
+    get:
+      tags: [datasets]
+      operationId: list_datasets
+      parameters:
+        - in: query
+          name: installation_id
+          schema:
+            type: string
+        - in: query
+          name: limit
+          schema:
+            type: integer
+            default: 100
+            minimum: 1
+            maximum: 500
+        - in: query
+          name: offset
+          schema:
+            type: integer
+            default: 0
+            minimum: 0
+      responses:
+        '200':
+          description: Dataset list
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/DatasetResult'
+    post:
+      tags: [datasets]
+      operationId: create_dataset
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required: [file, installation_id]
+              properties:
+                file:
+                  type: array
+                  items:
+                    type: string
+                    format: binary
+                installation_id:
+                  type: string
+                mapping:
+                  oneOf:
+                    - type: string
+                    - type: object
+                date_column:
+                  type: string
+                time_column:
+                  type: string
+                measurement_column:
+                  type: string
+                unit:
+                  type: string
+      responses:
+        '200':
+          description: Dataset uploaded and converted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DataUploadResult'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+
+  /datasets/inspect:
+    post:
+      tags: [datasets]
+      operationId: inspect_dataset
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required: [file]
+              properties:
+                file:
+                  type: string
+                  format: binary
+      responses:
+        '200':
+          description: CSV columns
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CsvColumnsResult'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+
+  /datasets/{dataset_id}:
+    get:
+      tags: [datasets]
+      operationId: get_dataset
+      parameters:
+        - in: path
+          name: dataset_id
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Dataset
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DatasetResult'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /models/train:
+    post:
+      tags: [models]
+      operationId: train_model
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required: [parquet_path]
+              properties:
+                parquet_path:
+                  type: string
+                optimize:
+                  type: boolean
+                  default: false
+                advanced_optimization:
+                  type: boolean
+                  default: false
+                n_trials:
+                  type: integer
+                  default: 50
+                activate_model:
+                  type: boolean
+                  default: false
+      responses:
+        '200':
+          description: Training queued
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TrainingRunQueuedResult'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '409':
+          description: Training already in progress
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /models/training-runs/{training_run_id}:
+    get:
+      tags: [models]
+      operationId: get_training_run_status
+      parameters:
+        - in: path
+          name: training_run_id
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Training run status
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TrainingRunStatusResult'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /models:
+    get:
+      tags: [models]
+      operationId: list_models
+      parameters:
+        - in: query
+          name: installation_id
+          schema:
+            type: string
+        - in: query
+          name: is_active
+          schema:
+            type: boolean
+        - in: query
+          name: target_column
+          schema:
+            type: string
+        - in: query
+          name: limit
+          schema:
+            type: integer
+            default: 100
+            minimum: 1
+            maximum: 500
+        - in: query
+          name: offset
+          schema:
+            type: integer
+            default: 0
+            minimum: 0
+      responses:
+        '200':
+          description: Model list
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ModelResult'
+
+  /models/{model_id}:
+    get:
+      tags: [models]
+      operationId: get_model
+      parameters:
+        - $ref: '#/components/parameters/ModelId'
+      responses:
+        '200':
+          description: Model
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ModelResult'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /models/{model_id}/metrics:
+    get:
+      tags: [models]
+      operationId: list_model_metrics
+      parameters:
+        - $ref: '#/components/parameters/ModelId'
+      responses:
+        '200':
+          description: Model metrics
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ModelMetricResult'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /models/{model_id}/activate:
+    patch:
+      tags: [models]
+      operationId: activate_model
+      parameters:
+        - $ref: '#/components/parameters/ModelId'
+      responses:
+        '200':
+          description: Activated model
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ModelResult'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /predictions:
+    get:
+      tags: [predictions]
+      operationId: predict_solar_yield
+      parameters:
+        - in: query
+          name: installation_id
+          required: true
+          schema:
+            type: string
+        - $ref: '#/components/parameters/StartDate'
+        - $ref: '#/components/parameters/EndDate'
+      responses:
+        '200':
+          description: Prediction result or not-ready state
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/PredictionResult'
+                  - $ref: '#/components/schemas/PredictionNotReadyResult'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /recommendations/usage-window:
+    post:
+      tags: [recommendations]
+      operationId: recommend_usage_window
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UsageWindowRecommendationRequest'
+      responses:
+        '200':
+          description: Recommendation result
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UsageWindowRecommendationResult'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+components:
+  parameters:
+    InstallationId:
+      in: path
+      name: installation_id
+      required: true
+      schema:
+        type: string
+    ModelId:
+      in: path
+      name: model_id
+      required: true
+      schema:
+        type: string
+    StartDate:
+      in: query
+      name: start_date
+      required: true
+      schema:
+        type: string
+        format: date
+    EndDate:
+      in: query
+      name: end_date
+      required: true
+      schema:
+        type: string
+        format: date
+  responses:
+    BadRequest:
+      description: Validation or request error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    NotFound:
+      description: Resource not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+  schemas:
+    ErrorResponse:
+      type: object
+      properties:
+        detail:
+          type: string
+      required: [detail]
+
+    OwnerPayload:
+      type: object
+      required: [first_name]
+      properties:
+        first_name:
+          type: string
+        last_name:
+          type: string
+          nullable: true
+
+    OwnerResult:
+      type: object
+      required: [id, first_name, display_name, created_at, updated_at]
+      properties:
+        id:
+          type: string
+        first_name:
+          type: string
+        last_name:
+          type: string
+          nullable: true
+        display_name:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+
+    InstallationCreate:
+      type: object
+      required: [name, country, city]
+      properties:
+        name:
+          type: string
+        country:
+          type: string
+        city:
+          type: string
+        panel_count:
+          type: integer
+          nullable: true
+        capacity_kwp:
+          type: number
+          format: double
+          nullable: true
+        installation_kwp:
+          type: number
+          format: double
+          nullable: true
+
+    InstallationConfigurationUpdate:
+      type: object
+      properties:
+        name:
+          type: string
+          nullable: true
+        country:
+          type: string
+          nullable: true
+        city:
+          type: string
+          nullable: true
+        panel_count:
+          type: integer
+          nullable: true
+        capacity_kwp:
+          type: number
+          format: double
+          nullable: true
+        installation_kwp:
+          type: number
+          format: double
+          nullable: true
+        consuming_activities:
+          type: array
+          items:
+            $ref: '#/components/schemas/ConsumingActivity'
+        appliances:
+          $ref: '#/components/schemas/ApplianceConsumption'
+
+    InstallationConfigurationResult:
+      type: object
+      required:
+        [id, owner_id, installation_id, available_consuming_activities, consuming_activities, appliances]
+      properties:
+        id:
+          type: string
+        owner_id:
+          type: string
+        installation_id:
+          type: string
+        is_active:
+          type: boolean
+          nullable: true
+        name:
+          type: string
+          nullable: true
+        country:
+          type: string
+          nullable: true
+        city:
+          type: string
+          nullable: true
+        latitude:
+          type: number
+          format: double
+          nullable: true
+        longitude:
+          type: number
+          format: double
+          nullable: true
+        panel_count:
+          type: integer
+          nullable: true
+        capacity_kwp:
+          type: number
+          format: double
+          nullable: true
+        available_consuming_activities:
+          type: array
+          items:
+            $ref: '#/components/schemas/ConsumingActivity'
+        consuming_activities:
+          type: array
+          items:
+            $ref: '#/components/schemas/ConsumingActivity'
+        appliances:
+          $ref: '#/components/schemas/ApplianceConsumption'
+
+    ApplianceConsumption:
+      type: object
+      properties:
+        car:
+          type: number
+          format: double
+        washing_machine:
+          type: number
+          format: double
+        dishwasher:
+          type: number
+          format: double
+        dryer:
+          type: number
+          format: double
+        boiler:
+          type: number
+          format: double
+
+    ConsumingActivity:
+      type: object
+      required: [name, consumption_kwh]
+      properties:
+        id:
+          type: string
+          nullable: true
+        name:
+          type: string
+        consumption_kwh:
+          type: number
+          format: double
+        category:
+          type: string
+          nullable: true
+        is_custom:
+          type: boolean
+
+    DashboardResult:
+      type: object
+      required: [installation_id, current_weather, tomorrow_weather]
+      properties:
+        installation_id:
+          type: string
+        current_output_kw:
+          type: number
+          format: double
+          nullable: true
+        todays_yield_kwh:
+          type: number
+          format: double
+          nullable: true
+        todays_peak_time_window:
+          type: string
+          nullable: true
+        current_weather:
+          $ref: '#/components/schemas/WeatherSummaryResult'
+        tomorrow_weather:
+          $ref: '#/components/schemas/TomorrowWeatherResult'
+
+    WeatherSummaryResult:
+      type: object
+      properties:
+        temperature_c:
+          type: number
+          format: double
+          nullable: true
+        status:
+          type: string
+          nullable: true
+
+    TomorrowWeatherResult:
+      type: object
+      properties:
+        min_temperature_c:
+          type: number
+          format: double
+          nullable: true
+        max_temperature_c:
+          type: number
+          format: double
+          nullable: true
+        status:
+          type: string
+          nullable: true
+
+    DatasetResult:
+      type: object
+      required: [id, installation_id, dataset_hash, path, row_count, granularity, value_column, created_at]
+      properties:
+        id:
+          type: string
+        installation_id:
+          type: string
+        dataset_hash:
+          type: string
+        path:
+          type: string
+        row_count:
+          type: integer
+        granularity:
+          type: string
+        value_column:
+          type: string
+        production_unit:
+          type: string
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+
+    CsvColumnsResult:
+      type: object
+      required: [filename, columns]
+      properties:
+        filename:
+          type: string
+        columns:
+          type: array
+          items:
+            type: string
+        preview_rows:
+          type: array
+          items:
+            $ref: '#/components/schemas/CsvPreviewRowResult'
+
+    CsvPreviewRowResult:
+      type: object
+      required: [values]
+      properties:
+        values:
+          type: object
+          additionalProperties:
+            type: string
+            nullable: true
+
+    TimeResolutionResult:
+      type: object
+      required: [kind]
+      properties:
+        kind:
+          type: string
+        interval_minutes:
+          type: number
+          format: double
+          nullable: true
+
+    DataUploadResult:
+      type: object
+      required:
+        [dataset_id, dataset_hash, dataset_already_exists, installation_id, production_unit, rows, columns, value_column, time_resolution, parquet_path]
+      properties:
+        dataset_id:
+          type: string
+        dataset_hash:
+          type: string
+        dataset_already_exists:
+          type: boolean
+        installation_id:
+          type: string
+        production_unit:
+          type: string
+        rows:
+          type: integer
+        columns:
+          type: array
+          items:
+            type: string
+        value_column:
+          type: string
+        time_resolution:
+          $ref: '#/components/schemas/TimeResolutionResult'
+        parquet_path:
+          type: string
+
+    TrainingRunQueuedResult:
+      type: object
+      required: [training_run_id, status]
+      properties:
+        training_run_id:
+          type: string
+        status:
+          type: string
+
+    TrainingRunSummaryResult:
+      type: object
+      required: [records, period_start, period_end, best_window_start, best_window_end, average_daily_production_kwh]
+      properties:
+        records:
+          type: integer
+        period_start:
+          type: string
+        period_end:
+          type: string
+        best_window_start:
+          type: string
+        best_window_end:
+          type: string
+        average_daily_production_kwh:
+          type: number
+          format: double
+
+    TrainingRunStatusResult:
+      type: object
+      required: [training_run_id, status, phase, progress]
+      properties:
+        training_run_id:
+          type: string
+        status:
+          type: string
+        phase:
+          type: string
+        progress:
+          type: integer
+        current_trial:
+          type: integer
+          nullable: true
+        total_trials:
+          type: integer
+          nullable: true
+        best_rmse:
+          type: number
+          format: double
+          nullable: true
+        error_code:
+          type: string
+          nullable: true
+        summary:
+          allOf:
+            - $ref: '#/components/schemas/TrainingRunSummaryResult'
+          nullable: true
+
+    ModelResult:
+      type: object
+      required:
+        [id, dataset_id, installation_id, name, model_name, version, model_path, is_active, created_at, mae, rmse, r2, mse, train_size, validation_size, test_size, target_column, metrics]
+      properties:
+        id:
+          type: string
+        dataset_id:
+          type: string
+        installation_id:
+          type: string
+        dataset_path:
+          type: string
+          nullable: true
+        name:
+          type: string
+        model_name:
+          type: string
+        version:
+          type: string
+        model_path:
+          type: string
+        is_active:
+          type: boolean
+        created_at:
+          type: string
+          format: date-time
+        accuracy:
+          type: number
+          format: double
+          nullable: true
+        offset_kw:
+          type: number
+          format: double
+          nullable: true
+        mae:
+          type: number
+          format: double
+        rmse:
+          type: number
+          format: double
+        r2:
+          type: number
+          format: double
+        mse:
+          type: number
+          format: double
+        train_size:
+          type: integer
+        validation_size:
+          type: integer
+        test_size:
+          type: integer
+        target_column:
+          type: string
+        metrics:
+          type: object
+          additionalProperties:
+            type: number
+            format: double
+
+    ModelMetricResult:
+      type: object
+      required: [id, model_id, metric_name, metric_value, created_at]
+      properties:
+        id:
+          type: string
+        model_id:
+          type: string
+        metric_name:
+          type: string
+        metric_value:
+          type: number
+          format: double
+        created_at:
+          type: string
+          format: date-time
+        accuracy:
+          type: number
+          format: double
+          nullable: true
+        offset_kw:
+          type: number
+          format: double
+          nullable: true
+
+    PredictionPointResult:
+      type: object
+      required: [timestamp, value]
+      properties:
+        timestamp:
+          type: string
+          format: date-time
+        value:
+          type: number
+          format: double
+
+    PredictionResult:
+      type: object
+      required: [unit, total_average, predictions]
+      properties:
+        unit:
+          type: string
+        total_average:
+          type: number
+          format: double
+        predictions:
+          type: array
+          items:
+            $ref: '#/components/schemas/PredictionPointResult'
+
+    PredictionNotReadyResult:
+      type: object
+      required: [status, reason, training_run_id]
+      properties:
+        status:
+          type: string
+        reason:
+          type: string
+        training_run_id:
+          type: string
+
+    UsageWindowRecommendationRequest:
+      type: object
+      required: [installation_id]
+      properties:
+        installation_id:
+          type: string
+        start:
+          type: string
+          format: date-time
+          nullable: true
+        end:
+          type: string
+          format: date-time
+          nullable: true
+        date:
+          type: string
+          format: date
+          nullable: true
+        preferred_start:
+          type: string
+          format: date-time
+          nullable: true
+        preferred_end:
+          type: string
+          format: date-time
+          nullable: true
+        energy_requirement_kwh:
+          type: number
+          format: double
+          nullable: true
+        preferred_strategy:
+          type: string
+          enum: [maximize_solar_usage]
+        selected_devices:
+          type: array
+          items:
+            $ref: '#/components/schemas/SelectedDevice'
+
+    SelectedDevice:
+      type: object
+      required: [name, consumption_kwh]
+      properties:
+        name:
+          type: string
+        consumption_kwh:
+          type: number
+          format: double
+
+    UsageWindowRecommendationResult:
+      type: object
+      properties:
+        installation_id:
+          type: string
+        preferred_strategy:
+          type: string
+        requested_start:
+          type: string
+          format: date-time
+        requested_end:
+          type: string
+          format: date-time
+        recommended_start:
+          type: string
+          format: date-time
+        recommended_end:
+          type: string
+          format: date-time
+        duration_hours:
+          type: number
+          format: double
+        energy_requirement_kwh:
+          type: number
+          format: double
+        expected_solar_energy_kwh:
+          type: number
+          format: double
+        expected_energy_shortfall_kwh:
+          type: number
+          format: double
+        expected_surplus_kwh:
+          type: number
+          format: double
+        expected_average_power_kw:
+          type: number
+          format: double
+        coverage_ratio:
+          type: number
+          format: double
+        confidence:
+          type: number
+          format: double
+        short_reason:
+          type: string
+        recommended_time_window:
+          type: string
+        expected_production_kwh:
+          type: number
+          format: double
+        device_schedule:
+          type: array
+          items:
+            $ref: '#/components/schemas/DeviceScheduleResult'
+        message:
+          type: string
+
+    DeviceScheduleResult:
+      type: object
+      properties:
+        device:
+          type: string
+        consumption_kwh:
+          type: number
+          format: double
+        start:
+          type: string
+          format: date-time
+        end:
+          type: string
+          format: date-time
+        reason:
+          type: string

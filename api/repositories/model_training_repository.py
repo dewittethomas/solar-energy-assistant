@@ -2,8 +2,14 @@ from pathlib import Path
 
 import numpy as np
 import pandas as pd
-from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
+from sklearn.metrics import (
+    mean_absolute_error,
+    mean_squared_error,
+    r2_score,
+    root_mean_squared_error,
+)
 from sklearn.model_selection import train_test_split
+
 
 class ModelTrainingRepository:
     def train_and_export(
@@ -13,14 +19,14 @@ class ModelTrainingRepository:
         output_path: Path,
         optimize: bool = False,
         n_trials: int = 50,
-        optimization_profile: str = 'hourly'
+        optimization_profile: str = 'hourly',
+        trial_callback=None,
     ) -> dict[str, object]:
+        del optimization_profile
         self._validate_training_data(features, target)
 
-        x = features.to_numpy(dtype=np.float32)
-        y = target.to_numpy(dtype=np.float32)
         x_train, x_validation, x_test, y_train, y_validation, y_test = (
-            self._split_data(x, y)
+            self._split_data(features, target)
         )
         best_params = (
             self._optimize_params(
@@ -29,28 +35,45 @@ class ModelTrainingRepository:
                 x_validation,
                 y_validation,
                 n_trials,
-                optimization_profile
+                trial_callback=trial_callback,
             )
             if optimize
             else {}
         )
-        training_mode = 'optuna' if optimize else 'xgboost_default'
-        model = self._fit_model(x_train, y_train, best_params)
-        train_metrics = self._calculate_metrics(y_train, model.predict(x_train))
-        validation_metrics = self._calculate_metrics(
+        training_mode = 'optuna' if optimize else 'catboost_default'
+        diagnostic_model = self._fit_model(
+            x_train,
+            y_train,
+            x_validation,
             y_validation,
-            model.predict(x_validation)
+            best_params,
         )
+        train_metrics = self._calculate_metrics(
+            y_train.to_numpy(dtype=np.float32),
+            diagnostic_model.predict(x_train),
+        )
+        validation_metrics = self._calculate_metrics(
+            y_validation.to_numpy(dtype=np.float32),
+            diagnostic_model.predict(x_validation),
+        )
+        x_train_final = pd.concat([x_train, x_validation], axis=0)
+        y_train_final = pd.concat([y_train, y_validation], axis=0)
+        final_model = self._fit_final_model(
+            x_train_final,
+            y_train_final,
+            best_params,
+        )
+        test_predictions = final_model.predict(x_test)
         test_metrics = self._calculate_metrics(
-            y_test,
-            model.predict(x_test)
+            y_test.to_numpy(dtype=np.float32),
+            test_predictions,
         )
         overfitting = self._check_overfitting(
             train_metrics,
             validation_metrics,
-            test_metrics
+            test_metrics,
         )
-        self._export_onnx(model, output_path, features.shape[1])
+        self._export_onnx(final_model, output_path)
 
         return {
             'model_path': output_path,
@@ -59,15 +82,11 @@ class ModelTrainingRepository:
             'test_rows': len(x_test),
             'best_params': best_params,
             'training_mode': training_mode,
-            'metrics': self._calculate_public_metrics(
-                train_metrics,
-                validation_metrics,
-                test_metrics
-            ),
+            'metrics': test_metrics,
             'train_metrics': train_metrics,
             'validation_metrics': validation_metrics,
             'test_metrics': test_metrics,
-            'overfitting': overfitting
+            'overfitting': overfitting,
         }
 
     def _validate_training_data(
@@ -83,97 +102,134 @@ class ModelTrainingRepository:
 
     def _split_data(
         self,
-        x: np.ndarray,
-        y: np.ndarray
-    ) -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
+        features: pd.DataFrame,
+        target: pd.Series
+    ) -> tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame, pd.Series, pd.Series, pd.Series]:
         x_train, x_split, y_train, y_split = train_test_split(
-            x,
-            y,
+            features,
+            target,
             test_size=0.3,
             random_state=42,
-            shuffle=False
+            shuffle=False,
         )
         x_validation, x_test, y_validation, y_test = train_test_split(
             x_split,
             y_split,
             test_size=0.5,
             random_state=42,
-            shuffle=False
+            shuffle=False,
         )
 
         return x_train, x_validation, x_test, y_train, y_validation, y_test
 
     def _optimize_params(
         self,
-        x_train: np.ndarray,
-        y_train: np.ndarray,
-        x_validation: np.ndarray,
-        y_validation: np.ndarray,
+        x_train: pd.DataFrame,
+        y_train: pd.Series,
+        x_validation: pd.DataFrame,
+        y_validation: pd.Series,
         n_trials: int,
-        optimization_profile: str
+        trial_callback=None
     ) -> dict[str, int | float]:
         import optuna
 
         optuna.logging.set_verbosity(optuna.logging.WARNING)
 
         def objective(trial):
-            params = self._suggest_params(trial, optimization_profile)
-            model = self._fit_model(x_train, y_train, params)
+            params = self._suggest_params(trial)
+            model = self._fit_model(
+                x_train,
+                y_train,
+                x_validation,
+                y_validation,
+                params,
+            )
             predictions = model.predict(x_validation)
-
-            return mean_absolute_error(y_validation, predictions)
+            return float(root_mean_squared_error(y_validation, predictions))
 
         study = optuna.create_study(direction='minimize')
-        study.optimize(objective, n_trials=n_trials)
+        callbacks = []
+
+        if trial_callback is not None:
+            def on_trial_complete(study, trial) -> None:
+                del trial
+                best_value = (
+                    float(study.best_value)
+                    if study.best_trial is not None
+                    else None
+                )
+                trial_callback(len(study.trials), n_trials, best_value)
+
+            callbacks.append(on_trial_complete)
+
+        study.optimize(objective, n_trials=n_trials, callbacks=callbacks)
 
         return study.best_params
 
-    def _suggest_params(
-        self,
-        trial,
-        optimization_profile: str
-    ) -> dict[str, int | float]:
-        if optimization_profile == 'monthly':
-            return {
-                'max_depth': trial.suggest_int('max_depth', 2, 4),
-                'learning_rate': trial.suggest_float('learning_rate', 0.01, 0.15),
-                'n_estimators': trial.suggest_int('n_estimators', 50, 300),
-                'subsample': trial.suggest_float('subsample', 0.7, 1.0),
-                'colsample_bytree': trial.suggest_float('colsample_bytree', 0.7, 1.0),
-                'min_child_weight': trial.suggest_float('min_child_weight', 2.0, 12.0),
-                'reg_alpha': trial.suggest_float('reg_alpha', 1e-3, 2.0, log=True),
-                'reg_lambda': trial.suggest_float('reg_lambda', 2.0, 15.0),
-                'gamma': trial.suggest_float('gamma', 0.0, 2.0)
-            }
-
+    def _suggest_params(self, trial) -> dict[str, int | float]:
         return {
-            'max_depth': trial.suggest_int('max_depth', 3, 6),
-            'learning_rate': trial.suggest_float('learning_rate', 0.005, 0.2),
-            'n_estimators': trial.suggest_int('n_estimators', 100, 700),
-            'subsample': trial.suggest_float('subsample', 0.6, 1.0),
-            'colsample_bytree': trial.suggest_float('colsample_bytree', 0.6, 1.0),
-            'min_child_weight': trial.suggest_float('min_child_weight', 1.0, 10.0),
-            'reg_alpha': trial.suggest_float('reg_alpha', 1e-4, 1.0, log=True),
-            'reg_lambda': trial.suggest_float('reg_lambda', 1.0, 10.0),
-            'gamma': trial.suggest_float('gamma', 0.0, 1.0)
+            'iterations': trial.suggest_int('iterations', 100, 1000),
+            'learning_rate': trial.suggest_float(
+                'learning_rate',
+                1e-3,
+                1.0,
+                log=True,
+            ),
+            'depth': trial.suggest_int('depth', 3, 6),
+            'subsample': trial.suggest_float('subsample', 0.5, 1.0),
+            'colsample_bylevel': trial.suggest_float(
+                'colsample_bylevel',
+                0.5,
+                1.0,
+            ),
+            'min_data_in_leaf': trial.suggest_int(
+                'min_data_in_leaf',
+                1,
+                100,
+            ),
         }
 
     def _fit_model(
         self,
-        x_train: np.ndarray,
-        y_train: np.ndarray,
+        x_train: pd.DataFrame,
+        y_train: pd.Series,
+        x_validation: pd.DataFrame,
+        y_validation: pd.Series,
         params: dict[str, int | float]
     ):
-        from xgboost import XGBRegressor
+        import catboost as cb
 
-        model = XGBRegressor(
-            random_state=42,
-            objective='reg:squarederror',
-            n_jobs=2,
-            **params
+        model = cb.CatBoostRegressor(
+            loss_function='RMSE',
+            random_seed=42,
+            verbose=False,
+            **params,
+        )
+        model.fit(
+            x_train,
+            y_train,
+            eval_set=(x_validation, y_validation),
+            use_best_model=True,
+            early_stopping_rounds=50,
+        )
+
+        return model
+
+    def _fit_final_model(
+        self,
+        x_train: pd.DataFrame,
+        y_train: pd.Series,
+        params: dict[str, int | float]
+    ):
+        import catboost as cb
+
+        model = cb.CatBoostRegressor(
+            loss_function='RMSE',
+            random_seed=42,
+            verbose=False,
+            **params,
         )
         model.fit(x_train, y_train)
-
         return model
 
     def _calculate_metrics(
@@ -187,26 +243,7 @@ class ModelTrainingRepository:
             'r2': float(r2_score(actual, predicted)),
             'mae': float(mean_absolute_error(actual, predicted)),
             'mse': float(mse),
-            'rmse': float(np.sqrt(mse))
-        }
-
-    def _calculate_public_metrics(
-        self,
-        train_metrics: dict[str, float],
-        validation_metrics: dict[str, float],
-        test_metrics: dict[str, float]
-    ) -> dict[str, float]:
-        metric_names = ['r2', 'mae', 'mse', 'rmse']
-
-        return {
-            name: float(
-                np.mean([
-                    train_metrics[name],
-                    validation_metrics[name],
-                    test_metrics[name]
-                ])
-            )
-            for name in metric_names
+            'rmse': float(np.sqrt(mse)),
         }
 
     def _check_overfitting(
@@ -304,21 +341,9 @@ class ModelTrainingRepository:
             'validation_test_r2_gap': float(validation_test_r2_gap),
             'train_validation_mae_ratio': float(train_validation_mae_ratio),
             'train_test_mae_ratio': float(train_test_mae_ratio),
-            'message': message
+            'message': message,
         }
 
-    def _export_onnx(
-        self,
-        model,
-        output_path: Path,
-        feature_count: int
-    ) -> None:
-        import onnxmltools
-        from onnxconverter_common.data_types import FloatTensorType
-
+    def _export_onnx(self, model, output_path: Path) -> None:
         output_path.parent.mkdir(parents=True, exist_ok=True)
-        onnx_model = onnxmltools.convert_xgboost(
-            model,
-            initial_types=[('input', FloatTensorType([None, feature_count]))]
-        )
-        output_path.write_bytes(onnx_model.SerializeToString())
+        model.save_model(str(output_path), format='onnx')

@@ -7,14 +7,10 @@ class HourlyResampler:
         resolution = TimeResolutionDetector().detect(df)
 
         if resolution.kind == 'monthly':
-            return df.copy()
+            raise ValueError('Monthly datasets are not supported')
 
         value_column = self._get_value_column(df)
-        aggregation = (
-            'mean'
-            if value_column == 'power_kw'
-            else lambda values: values.sum(min_count=1)
-        )
+        aggregation = 'mean'
 
         source = df.copy()
         source['timestamp'] = pd.to_datetime(
@@ -40,13 +36,13 @@ class HourlyResampler:
     def _get_value_column(self, df: pd.DataFrame) -> str:
         value_columns = [
             column
-            for column in ('power_kw', 'energy_kwh')
+            for column in ('power_kw',)
             if column in df.columns
         ]
 
         if len(value_columns) != 1:
             raise ValueError(
-                'Expected exactly one value column: power_kw or energy_kwh'
+                'Expected exactly one value column: power_kw'
             )
 
         return value_columns[0]

@@ -1,4 +1,3 @@
-from collections import defaultdict
 from datetime import datetime
 from pathlib import Path
 
@@ -7,8 +6,7 @@ import onnxruntime as ort
 
 from models.prediction import Prediction
 from responses.prediction_result import (
-    DailyPredictionResult,
-    HourlyPredictionResult,
+    PredictionPointResult,
     PredictionResult,
 )
 
@@ -53,6 +51,7 @@ class PredictionRepository:
         session_options = ort.SessionOptions()
         session_options.intra_op_num_threads = 2
         session_options.inter_op_num_threads = 1
+        session_options.log_severity_level = 3
         session = ort.InferenceSession(
             resolved_path.as_posix(),
             sess_options=session_options,
@@ -82,11 +81,16 @@ class PredictionRepository:
         return np.array(
             [
                 [
-                    inp.cloud_cover,
-                    inp.shortwave_radiation,
-                    inp.diffuse_radiation,
                     inp.direct_normal_irradiance,
-                    inp.terrestrial_radiation,
+                    inp.diffuse_radiation,
+                    inp.shortwave_radiation,
+                    inp.cloud_cover,
+                    inp.temperature_2m,
+                    inp.relative_humidity_2m,
+                    inp.wind_speed_10m,
+                    inp.surface_pressure,
+                    inp.solar_elevation_deg,
+                    inp.solar_azimuth_deg,
                     inp.hour_sin,
                     inp.hour_cos,
                     inp.day_of_year_sin,
@@ -102,53 +106,24 @@ class PredictionRepository:
         raw_predictions: np.ndarray,
         input_tensor: np.ndarray
     ) -> np.ndarray:
-        shortwave_radiation = input_tensor[:, 1]
-
-        scale = 1 / (
-            1 + np.exp(-0.1 * (shortwave_radiation - 30))
-        )
-
-        scaled_predictions = raw_predictions * scale
-
-        return np.maximum(
-            scaled_predictions,
-            0.0
-        )
+        del input_tensor
+        return np.maximum(raw_predictions, 0.0)
 
     def _build_response(
         self,
         predictions: np.ndarray,
         time_data: list[str]
     ) -> PredictionResult:
-        grouped_days = defaultdict(list)
-
-        for prediction, time_value in zip(predictions, time_data):
-            timestamp = datetime.fromisoformat(time_value)
-            grouped_days[timestamp.date()].append(
-                HourlyPredictionResult(
-                    hour=timestamp.time(),
-                    value=float(prediction)
-                )
-            )
-
-        daily_results = []
-
-        for day, hourly_predictions in sorted(grouped_days.items()):
-            daily_average = np.mean(
-                [p.value for p in hourly_predictions]
-            )
-
-            daily_results.append(
-                DailyPredictionResult(
-                    day=day,
-                    average=float(daily_average),
-                    predictions=hourly_predictions
-                )
-            )
-
         total_average = np.mean(predictions)
 
         return PredictionResult(
+            unit='W',
             total_average=float(total_average),
-            predictions=daily_results
+            predictions=[
+                PredictionPointResult(
+                    timestamp=datetime.fromisoformat(time_value),
+                    value=float(prediction)
+                )
+                for prediction, time_value in zip(predictions, time_data)
+            ]
         )

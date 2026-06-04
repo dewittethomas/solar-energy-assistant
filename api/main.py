@@ -3,7 +3,15 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastmcp import FastMCP
 
 from core.settings import get_settings
-from routers import datasets, model_training, predictions, recommendations, users
+from routers import (
+    datasets,
+    developer,
+    installations,
+    model_training,
+    owner,
+    predictions,
+    recommendations,
+)
 
 settings = get_settings()
 
@@ -26,4 +34,6 @@ app.include_router(datasets.router)
 app.include_router(predictions.router)
 app.include_router(recommendations.router)
 app.include_router(model_training.router)
-app.include_router(users.router)
+app.include_router(owner.router)
+app.include_router(installations.router)
+app.include_router(developer.router)

@@ -7,7 +7,7 @@ from repositories.model_training_repository import ModelTrainingRepository
 from repositories.metadata_repository import MetadataRepository
 from repositories.dataset_repository import DatasetRepository
 from repositories.model_repository import ModelRepository
-from repositories.user_repository import UserRepository
+from repositories.owner_repository import OwnerRepository
 from services.weather_service import WeatherService
 from services.geocoding_service import GeocodingService
 from services.cache_service import CacheService
@@ -21,10 +21,18 @@ from services.metadata_service import MetadataService
 from services.dataset_service import DatasetService
 from services.model_service import ModelService
 from services.recommendation_service import RecommendationService
-from services.user_service import UserService
+from services.owner_service import OwnerService
+from services.installation_service import InstallationService
+from services.consuming_activity_catalog import ConsumingActivityCatalog
+from services.consuming_activity_seeder import ConsumingActivitySeeder
 from pipeline import CsvPreprocessingPipeline, ModelTrainingPipeline
 
 _cache_repository = CacheRepository()
+_metadata_repository = MetadataRepository()
+_weather_repository = WeatherRepository()
+_geocoding_repository = GeocodingRepository()
+_consuming_activity_catalog = ConsumingActivityCatalog()
+_consuming_activity_seeder = ConsumingActivitySeeder(_consuming_activity_catalog)
 
 def get_cache_repository():
     return _cache_repository
@@ -34,7 +42,7 @@ def get_cache_service():
     return CacheService(repo)
 
 def get_metadata_repository():
-    return MetadataRepository()
+    return _metadata_repository
 
 def get_metadata_service():
     repo = get_metadata_repository()
@@ -54,12 +62,22 @@ def get_model_service():
     repo = get_model_repository()
     return ModelService(repo)
 
-def get_user_repository():
-    return UserRepository(get_metadata_repository())
+def get_owner_repository():
+    return OwnerRepository(get_metadata_repository())
 
-def get_user_service():
-    repo = get_user_repository()
-    return UserService(repo)
+def get_owner_service():
+    repo = get_owner_repository()
+    return OwnerService(repo)
+
+def get_installation_service():
+    return InstallationService(
+        get_metadata_repository(),
+        get_prediction_service(),
+        get_weather_service(),
+        get_geocoding_service(),
+        _consuming_activity_catalog,
+        _consuming_activity_seeder,
+    )
 
 # Predictions
 def get_prediction_service():
@@ -67,12 +85,14 @@ def get_prediction_service():
     weather_service = get_weather_service()
     geocoding_service = get_geocoding_service()
     model_service = get_model_service()
+    metadata_service = get_metadata_service()
     cache_service = get_cache_service()
     return PredictionService(
         weather_service,
         geocoding_service,
         repo,
         model_service,
+        metadata_service,
         cache_service
     )
 
@@ -84,7 +104,7 @@ def get_recommendation_service():
     return RecommendationService(prediction_service)
 
 def get_weather_repository():
-    return WeatherRepository()
+    return _weather_repository
 
 def get_weather_service():
     repo = get_weather_repository()
@@ -92,7 +112,7 @@ def get_weather_service():
 
 # Geocoding
 def get_geocoding_repository():
-    return GeocodingRepository()
+    return _geocoding_repository
 
 def get_geocoding_service():
     repo = get_geocoding_repository()

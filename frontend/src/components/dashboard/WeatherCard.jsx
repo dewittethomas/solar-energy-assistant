@@ -19,8 +19,8 @@ export function WeatherCard({ weather }) {
       <div className="weather-overview">
         <div className="weather-current">
           <div>
-            <strong>{t(weather.currentTemperatureKey)}</strong>
-            <span>{t(weather.cloudStatusKey)}</span>
+            <strong>{weather.currentTemperature || t(weather.currentTemperatureKey)}</strong>
+            <span>{weather.cloudStatus || t(weather.cloudStatusKey)}</span>
           </div>
           <div className="weather-icon-cluster" aria-hidden="true">
             <SunMedium className="weather-sun" size={32} strokeWidth={2} />
@@ -33,11 +33,11 @@ export function WeatherCard({ weather }) {
             <span>{t('dashboard.weather.tomorrow')}</span>
           </div>
           <strong className="tomorrow-range">
-            {t(weather.tomorrowMinKey)} - {t(weather.tomorrowMaxKey)}
+            {weather.tomorrowMin || t(weather.tomorrowMinKey)} - {weather.tomorrowMax || t(weather.tomorrowMaxKey)}
           </strong>
           <div className="tomorrow-condition">
             <Cloud className="tomorrow-cloud-icon" size={19} strokeWidth={2} />
-            <span>{t('dashboard.weather.tomorrowCloudStatus')}</span>
+            <span>{weather.tomorrowCloudStatus || t('dashboard.weather.tomorrowCloudStatus')}</span>
           </div>
         </div>
       </div>

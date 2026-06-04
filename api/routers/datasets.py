@@ -3,6 +3,7 @@ from typing import Annotated
 from fastapi import APIRouter, Depends, File, Form, HTTPException, Query, UploadFile
 
 from responses.data_upload_result import CsvColumnsResult, DataUploadResult
+from responses.dataset_analytics_result import DatasetAnalyticsResult
 from responses.dataset_result import DatasetResult
 from services.dataset_service import DatasetService
 from services.data_upload_service import DataUploadService
@@ -26,10 +27,15 @@ DatasetServiceDep = Annotated[
 )
 async def list_datasets(
     dataset_service: DatasetServiceDep,
+    installation_id: str | None = Query(None),
     limit: int = Query(100, ge=1, le=500),
     offset: int = Query(0, ge=0)
 ) -> list[DatasetResult]:
-    return dataset_service.list_datasets(limit=limit, offset=offset)
+    return dataset_service.list_datasets(
+        limit=limit,
+        offset=offset,
+        installation_id=installation_id
+    )
 
 @router.get(
     '/{dataset_id}',
@@ -46,6 +52,26 @@ async def get_dataset(
         raise HTTPException(status_code=404, detail='Dataset not found')
 
     return dataset
+
+
+@router.get(
+    '/{dataset_id}/analytics',
+    operation_id='get_dataset_analytics',
+    response_model=DatasetAnalyticsResult
+)
+async def get_dataset_analytics(
+    dataset_id: str,
+    dataset_service: DatasetServiceDep
+) -> DatasetAnalyticsResult:
+    try:
+        analytics = dataset_service.get_dataset_analytics(dataset_id)
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+    if not analytics:
+        raise HTTPException(status_code=404, detail='Dataset not found')
+
+    return DatasetAnalyticsResult(**analytics)
 
 @router.post(
     '',

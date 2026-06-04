@@ -6,3 +6,5 @@ class ModelMetricResult(BaseModel):
     metric_name: str
     metric_value: float
     created_at: str
+    accuracy: float | None = None
+    offset_kw: float | None = None

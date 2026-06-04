@@ -1,7 +1,7 @@
 import { UserRound } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 
-export function Header() {
+export function Header({ user }) {
   const { t } = useTranslation()
 
   return (
@@ -11,7 +11,7 @@ export function Header() {
         <div className="profile-icon" aria-hidden="true">
           <UserRound size={20} strokeWidth={2.4} />
         </div>
-        <strong>{t('profile.name')}</strong>
+        <strong>{user?.name || t('profile.name')}</strong>
       </div>
     </header>
   )
